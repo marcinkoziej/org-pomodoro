@@ -6,8 +6,48 @@
 (require 'timer)
 (require 'org)
 
-;;(add-to-list 'org-modules 'org-timer)
-;;(setq org-timer-default-timer 25)
+(defgroup org-pomodoro nil "Org pomodoro customization"
+  :tag "Org Pomodoro"
+  :group 'org-progress)
+
+(defun org-pomodoro-growl-register ()
+ (do-applescript 
+  "tell application \"GrowlHelperApp\"
+ -- Declare a list of notification types
+ set the allNotificationsList to {\"Pomodoro completed\", \"Pomodoro break finished\"}
+
+ -- Declare list of active notifications.  If some of them
+ -- isn't activated, user can do this later via preferences
+ set the enabledNotificationsList to {\"Pomodoro complete\",\"Pomodoro break finished\"}
+
+ -- Register our application in Growl.
+ register as application \"Aquamacs\" all notifications allNotificationsList \
+    default notifications enabledNotificationsList \
+    icon of application \"Aquamacs\"
+end tell"))
+
+(defun org-pomodoro-growl-notify (what message)
+  (do-applescript
+   (format
+    "tell application \"GrowlHelperApp\" 
+notify with name \"%s\" title \"Pomodoro\"  description \"%s\"  application name \"Aquamacs\" 
+end tell"
+    
+    (cond ((eq what :pomodoro) "Pomodoro complete")
+	  ((eq what :break) "Pomodoro break finished"))
+    message)
+))
+
+
+(defcustom org-pomodoro-growl-notifications nil
+  "Notify via Growl"
+  :group 'org-pomodoro
+  :type '(boolean)
+  :set '(lambda (s v) 
+	  (set s v)
+	  (when v
+	      (org-pomodoro-growl-register))))
+
 
 (defvar org-pomodoro-timer nil)
 (defvar org-pomodoro-timer-start 0)
@@ -72,6 +112,8 @@
 ;      (message "%s %s" org-pomodoro-phase (org-pomodoro-seconds-elapsed))
       (when (> (org-pomodoro-seconds-elapsed) (* 60 25))
 	(message "Pomodoro completed! Time for a break!")
+	(when org-pomodoro-growl-notifications
+	  (org-pomodoro-growl-notify :pomodoro "Pomodoro completed! Time for a break!"))
 	(org-pomodoro-start :break)
 	(run-hooks 'org-pomodoro-done-hook))
       (org-pomodoro-update-mode-line)))
@@ -79,6 +121,8 @@
     (progn 
       (when (> (org-pomodoro-seconds-elapsed) (* 60 5))
 	(message "Break is over, ready for another one?")
+	(when org-pomodoro-growl-notifications
+	  (org-pomodoro-growl-notify :break "Break is over, ready for another one?"))
 	(progn 
 	  (org-pomodoro-kill)
 	  (message "You've smashed the pomodoro")
@@ -124,4 +168,7 @@
 ;;       (if (not org-timer-last-timer) 
 ;; 	  (org-timer-set-timer "25"))))
 
-(provide 'pomodoro)
+
+
+
+(provide 'org-pomodoro)
