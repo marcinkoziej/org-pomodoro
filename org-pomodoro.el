@@ -18,7 +18,7 @@
 
  -- Declare list of active notifications.  If some of them
  -- isn't activated, user can do this later via preferences
- set the enabledNotificationsList to {\"Pomodoro complete\",\"Pomodoro break finished\"}
+ set the enabledNotificationsList to {\"Pomodoro completed\",\"Pomodoro break finished\"}
 
  -- Register our application in Growl.
  register as application \"Aquamacs\" all notifications allNotificationsList \
@@ -33,7 +33,7 @@ end tell"))
 notify with name \"%s\" title \"Pomodoro\"  description \"%s\"  application name \"Aquamacs\" 
 end tell"
     
-    (cond ((eq what :pomodoro) "Pomodoro complete")
+    (cond ((eq what :pomodoro) "Pomodoro completed")
 	  ((eq what :break) "Pomodoro break finished"))
     message)
 ))
