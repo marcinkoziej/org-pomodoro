@@ -5,6 +5,7 @@
 
 (require 'timer)
 (require 'org)
+(require 'org-timer)
 
 (defgroup org-pomodoro nil "Org pomodoro customization"
   :tag "Org Pomodoro"
