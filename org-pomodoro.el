@@ -84,8 +84,8 @@ a pomodoro and to :longbreak or :break when starting a break.")
 (defun org-pomodoro-play-sound (sound)
   "Plays a sound."
   (when (and org-pomodoro-play-sounds sound)
-    (play-sound-fil
-e sound)))
+    (play-sound-file sound)))
+
 
 (defun org-pomodoro-minutes ()
   "Returns the current countdown value in minutes as string."
