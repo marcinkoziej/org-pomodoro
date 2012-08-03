@@ -114,6 +114,7 @@ a pomodoro and to :longbreak or :break when starting a break.")
   (org-pomodoro-reset)
   (org-pomodoro-killed))
 
+
 (defun org-pomodoro-tick ()
   "A callback that is invoked by the running timer each second.
 It checks whether we reached the duration of the current phase, when 't it
@@ -152,6 +153,7 @@ The default state is `:pomodoro`."
         org-pomodoro-timer (run-with-timer t 1 'org-pomodoro-tick))
   (org-pomodoro-update-mode-line))
 
+
 (defun org-pomodoro-reset ()
   "Resets the org-pomodoro state."
   (when org-pomodoro-timer
@@ -160,10 +162,10 @@ The default state is `:pomodoro`."
         org-pomodoro-countdown 0)
   (org-pomodoro-update-mode-line))
 
+
 ;; -----------------------------
 ;; Handlers for pomodoro events.
 ;; -----------------------------
-
 (defun org-pomodoro-finished ()
   "Is invoked when a pomodoro was finished successfully. This may send a
 notification, play a sound and start a pomodoro break."
@@ -230,5 +232,6 @@ kill the current timer, this may be a break or a running pomodoro."
     (if (y-or-n-p "There is already a running timer. Would You like to stop it?")
         (org-pomodoro-kill)
       (message "Alright, keep up the good work!"))))
+
 
 (provide 'org-pomodoro)
