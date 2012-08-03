@@ -204,12 +204,13 @@ a sound."
 and play a sound."
   (notify "Break finished" "Long break finished. Ready for another pomodoro?")
   (org-pomodoro-play-sound org-pomodoro-long-break-sound)
+  (setq org-pomodoro-count 0)
   (org-pomodoro-reset))
+
 
 ;; ---------------------------------------
 ;; The actual function to handle pomodoros
 ;; ---------------------------------------
-
 (defun org-pomodoro (&optional abc)
   "When no timer is running for `org-pomodoro` a new pomodoro is started and
 the current task is clocked in. Otherwise emacs will ask whether we´d like to
