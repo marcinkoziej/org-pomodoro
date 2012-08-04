@@ -96,16 +96,18 @@ a pomodoro and to :longbreak or :break when starting a break.")
 (defun org-pomodoro-update-mode-line ()
   "Sets the modeline accordingly to the current state."
   (setq org-pomodoro-mode-line
-        (list
-         "["
-         (propertize (format (case org-pomodoro-state
-                               (:none "")
-                               (:pomodoro org-pomodoro-format)
-                               (:short-break org-pomodoro-short-break-format)
-                               (:long-break org-pomodoro-long-break-format))
-                             (org-pomodoro-minutes))
-                     'face 'org-pomodoro-mode-line)
-         "] "))
+        (if (not (eq org-pomodoro-state :none))
+            (list
+             "["
+             (propertize (format (case org-pomodoro-state
+                                   (:none "")
+                                   (:pomodoro org-pomodoro-format)
+                                   (:short-break org-pomodoro-short-break-format)
+                                   (:long-break org-pomodoro-long-break-format))
+                                 (org-pomodoro-minutes))
+                         'face 'org-pomodoro-mode-line)
+             "] ")
+          nil))
   (force-mode-line-update))
 
 
