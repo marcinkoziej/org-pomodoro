@@ -75,6 +75,15 @@ a pomodoro and to :longbreak or :break when starting a break.")
   "The path to a sound file that´s to be played when a long break is finished.")
 
 
+(defvar org-pomodoro-started-hook nil
+  "Hooks run when a pomodoro is started.")
+
+(defvar org-pomodoro-finished-hook nil
+  "Hooks run when a pomodoro is finished.")
+
+(defvar org-pomodoro-killed-hook nil
+  "Hooks run when a pomodoro is killed.")
+
 (defface org-pomodoro-mode-line
   '((t (:foreground "tomato1")))
   "Org Pomodoro mode line color"
@@ -127,12 +136,9 @@ invokes the handlers for finishing."
       (setq org-pomodoro-countdown (- org-pomodoro-countdown 1))
       (when (< org-pomodoro-countdown 1)
         (case org-pomodoro-state
-          (:pomodoro
-           (org-pomodoro-finished))
-          (:short-break
-           (org-pomodoro-short-break-finished))
-          (:long-break
-           (org-pomodoro-long-break-finished))))))
+          (:pomodoro (org-pomodoro-finished))
+          (:short-break (org-pomodoro-short-break-finished))
+          (:long-break (org-pomodoro-long-break-finished))))))
   (org-pomodoro-update-mode-line))
 
 
@@ -153,6 +159,8 @@ The default state is `:pomodoro`."
                                  (:short-break (* 60 org-pomodoro-short-break-length))
                                  (:long-break (* 60 org-pomodoro-long-break-length)))
         org-pomodoro-timer (run-with-timer t 1 'org-pomodoro-tick))
+  (when (eq org-pomodoro-state :pomodoro)
+    (run-hooks 'org-pomodoro-started-hook))
   (org-pomodoro-update-mode-line))
 
 
