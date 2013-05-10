@@ -37,23 +37,14 @@
 (require 'org-timer)
 (require 'notify)
 
+
+;; -----------------------------
+;; Customizables
+;; -----------------------------
 (defgroup org-pomodoro nil
   "Org pomodoro customization"
   :tag "Org Pomodoro"
   :group 'org-progress)
-
-(defvar org-pomodoro-timer nil
-  "The timer while a pomodoro or a break.")
-
-(defvar org-pomodoro-countdown 0
-  "The actual countdown value for a phase in seconds.")
-
-(defvar org-pomodoro-state :none
-  "The current state of `org-pomodoro`. It changes to :pomodoro when starting
-a pomodoro and to :longbreak or :break when starting a break.")
-
-(defvar org-pomodoro-count 0
-  "The number of pomodoros since the last long break.")
 
 (defvar org-pomodoro-long-break-frequency 4
   "The maximum number of pomodoros until a long break is started.")
@@ -103,7 +94,9 @@ a pomodoro and to :longbreak or :break when starting a break.")
           "/resources/bell_multiple.wav")
   "The path to a sound file that´s to be played when a long break is finished.")
 
-
+;; -----------------------------
+;; Hooks
+;; -----------------------------
 (defvar org-pomodoro-started-hook nil
   "Hooks run when a pomodoro is started.")
 
@@ -118,21 +111,40 @@ a pomodoro and to :longbreak or :break when starting a break.")
   "Org Pomodoro mode line color"
   :group 'faces)
 
+;; -----------------------------
+;; Temporary Variables
+;; -----------------------------
+(defvar org-pomodoro-timer nil
+  "The timer while a pomodoro or a break.")
 
+(defvar org-pomodoro-countdown 0
+  "The actual countdown value for a phase in seconds.")
+
+(defvar org-pomodoro-state :none
+  "The current state of `org-pomodoro`.
+It changes to :pomodoro when starting a pomodoro and to :longbreak
+or :break when starting a break.")
+
+(defvar org-pomodoro-count 0
+  "The number of pomodoros since the last long break.")
+
+;; -----------------------------
+;; Helper Functions
+;; -----------------------------
 (defun org-pomodoro-play-sound (sound)
-  "Plays a sound."
+  "Play an audio file specified by SOUND."
   (when (and org-pomodoro-play-sounds sound)
     (play-sound-file sound)))
 
 
 (defun org-pomodoro-minutes ()
-  "Returns the current countdown value in minutes as string."
+  "Return the current countdown value in minutes as string."
   (let ((hms (org-timer-secs-to-hms org-pomodoro-countdown)))
     (substring hms (- (length hms) 5))))
 
 
 (defun org-pomodoro-update-mode-line ()
-  "Sets the modeline accordingly to the current state."
+  "Set the modeline accordingly to the current state."
   (setq org-pomodoro-mode-line
         (if (not (eq org-pomodoro-state :none))
             (list
@@ -150,7 +162,7 @@ a pomodoro and to :longbreak or :break when starting a break.")
 
 
 (defun org-pomodoro-kill ()
-  "Kills the current timer, resets the phase and updates the modeline."
+  "Kill the current timer, reset the phase and update the modeline."
   (org-pomodoro-reset)
   (org-pomodoro-killed))
 
@@ -172,8 +184,8 @@ invokes the handlers for finishing."
 
 
 (defun org-pomodoro-start (&optional state)
-  "Start the `org-pomodoro` timer. The argument is optional.
-The default state is `:pomodoro`."
+  "Start the `org-pomodoro` timer.
+The argument STATE is optional.  The default state is `:pomodoro`."
   (when org-pomodoro-timer (cancel-timer org-pomodoro-timer))
 
   ;; add the org-pomodoro-mode-line to the global-mode-string
@@ -194,7 +206,7 @@ The default state is `:pomodoro`."
 
 
 (defun org-pomodoro-reset ()
-  "Resets the org-pomodoro state."
+  "Reset the org-pomodoro state."
   (when org-pomodoro-timer
     (cancel-timer org-pomodoro-timer))
   (setq org-pomodoro-state :none
@@ -206,8 +218,8 @@ The default state is `:pomodoro`."
 ;; Handlers for pomodoro events.
 ;; -----------------------------
 (defun org-pomodoro-finished ()
-  "Is invoked when a pomodoro was finished successfully. This may send a
-notification, play a sound and start a pomodoro break."
+  "Is invoked when a pomodoro was finished successfully.
+This may send a notification, play a sound and start a pomodoro break."
   (org-clock-out)
   (org-pomodoro-play-sound org-pomodoro-sound)
   (setq org-pomodoro-count (+ org-pomodoro-count 1))
@@ -223,8 +235,8 @@ notification, play a sound and start a pomodoro break."
 
 
 (defun org-pomodoro-killed ()
-  "Is invoked when a pomodoro was killed. This may send a notification,
-play a sound and adds log."
+  "Is invoked when a pomodoro was killed.
+This may send a notification, play a sound and adds log."
   (notify "Pomodoro killed" "One does not simply kill a pomodoro!")
   (org-clock-cancel)
   (org-pomodoro-reset)
@@ -233,16 +245,16 @@ play a sound and adds log."
 
 
 (defun org-pomodoro-short-break-finished ()
-  "Is invoked when a break is finished. This may send a notification and play
-a sound."
+  "Is invoked when a break is finished.
+This may send a notification and play a sound."
   (notify "Break finished" "Short break finished. Ready for another pomodoro?")
   (org-pomodoro-play-sound org-pomodoro-short-break-sound)
   (org-pomodoro-reset))
 
 
 (defun org-pomodoro-long-break-finished ()
-  "Is invoked when a long break is finished. This may send a notification
-and play a sound."
+  "Is invoked when a long break is finished.
+This may send a notification and play a sound."
   (notify "Break finished" "Long break finished. Ready for another pomodoro?")
   (org-pomodoro-play-sound org-pomodoro-long-break-sound)
   (setq org-pomodoro-count 0)
@@ -252,9 +264,10 @@ and play a sound."
 ;; ---------------------------------------
 ;; The actual function to handle pomodoros
 ;; ---------------------------------------
-(defun org-pomodoro (&optional abc)
-  "When no timer is running for `org-pomodoro` a new pomodoro is started and
-the current task is clocked in. Otherwise emacs will ask whether we´d like to
+(defun org-pomodoro ()
+  "Start a new pomodoro or stop the current one.
+When no timer is running for `org-pomodoro` a new pomodoro is started and
+the current task is clocked in.  Otherwise EMACS will ask whether we´d like to
 kill the current timer, this may be a break or a running pomodoro."
   (interactive "p")
   (if (equal org-pomodoro-state :none)
@@ -268,9 +281,11 @@ kill the current timer, this may be a break or a running pomodoro."
          (t (let ((current-prefix-arg '(4)))
               (call-interactively 'org-clock-in))))
         (org-pomodoro-start :pomodoro))
-    (if (y-or-n-p "There is already a running timer. Would You like to stop it?")
+    (if (y-or-n-p "There is already a running timer.  Would you like to stop it? ")
         (org-pomodoro-kill)
       (message "Alright, keep up the good work!"))))
 
 
 (provide 'org-pomodoro)
+
+;;; org-pomodoro.el ends here
