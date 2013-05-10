@@ -37,7 +37,6 @@
 (require 'org-timer)
 (require 'notify)
 
-
 ;; -----------------------------
 ;; Customizables
 ;; -----------------------------
@@ -46,53 +45,76 @@
   :tag "Org Pomodoro"
   :group 'org-progress)
 
-(defvar org-pomodoro-long-break-frequency 4
-  "The maximum number of pomodoros until a long break is started.")
+(defcustom org-pomodoro-long-break-frequency 4
+  "The maximum number of pomodoros until a long break is started."
+  :group 'org-pomodoro
+  :type 'integer)
 
-(defvar org-pomodoro-mode-line "")
-(put 'org-pomodoro-mode-line 'risky-local-variable t)
-
-(defvar org-pomodoro-play-sounds t
-  "Determines whether sounds are played or not.")
+(defcustom org-pomodoro-play-sounds t
+  "Determines whether sounds are played or not."
+  :group 'org-pomodoro
+  :type 'boolean)
 
 ;; POMODORO VALUES
-(defvar org-pomodoro-length 25
-  "The length of a pomodoro in minutes.")
+(defcustom org-pomodoro-length 25
+  "The length of a pomodoro in minutes."
+  :group 'org-pomodoro
+  :type 'integer)
 
-(defvar org-pomodoro-format "Pomodoro~%s"
-  "The format of the mode line string during a long break.")
+(defcustom org-pomodoro-format "Pomodoro~%s"
+  "The format of the mode line string during a long break."
+  :group 'org-pomodoro
+  :type 'string)
 
-(defvar org-pomodoro-sound
-  (concat (file-name-directory load-file-name)
-          "/resources/bell.wav")
-  "The path to a sound file that´s to be played when a pomodoro was finished.")
+(defcustom org-pomodoro-sound
+  (concat (file-name-directory load-file-name) "/resources/bell.wav")
+  "The path to a sound file that´s to be played when a pomodoro was finished."
+  :group 'org-pomodoro
+  :type 'file)
 
-(defvar org-pomodoro-killed-sound nil
-  "The path to a sound file, that´s to be played when a pomodoro is killed.")
+(defcustom org-pomodoro-killed-sound nil
+  "The path to a sound file, that´s to be played when a pomodoro is killed."
+  :group 'org-pomodoro
+  :type 'file)
 
 ;; SHORT BREAK VALUES
-(defvar org-pomodoro-short-break-length 5
-  "The length of a break in minutes.")
+(defcustom org-pomodoro-short-break-length 5
+  "The length of a break in minutes."
+  :group 'org-pomodoro
+  :type 'integer)
 
-(defvar org-pomodoro-short-break-format "Short Break~%s"
-  "The format of the mode line string during a long break.")
+(defcustom org-pomodoro-short-break-format "Short Break~%s"
+  "The format of the mode line string during a long break."
+  :group 'org-pomodoro
+  :type 'string)
 
-(defvar org-pomodoro-short-break-sound
-  (concat (file-name-directory load-file-name)
-          "/resources/bell.wav")
-  "The path to a sound file that´s to be played when a break was finished.")
+(defcustom org-pomodoro-short-break-sound
+  (concat (file-name-directory load-file-name) "/resources/bell.wav")
+  "The path to a sound file that´s to be played when a break was finished."
+  :group 'org-pomodoro
+  :type 'file)
 
 ;; LONG BREAK VALUES
-(defvar org-pomodoro-long-break-length 20
-  "The length of a long break in minutes.")
+(defcustom org-pomodoro-long-break-length 20
+  "The length of a long break in minutes."
+  :group 'org-pomodoro
+  :type 'integer)
 
-(defvar org-pomodoro-long-break-format "Long Break~%s"
-  "The format of the mode line string during a long break.")
+(defcustom org-pomodoro-long-break-format "Long Break~%s"
+  "The format of the mode line string during a long break."
+  :group 'org-pomodoro
+  :type 'string)
 
-(defvar org-pomodoro-long-break-sound
-  (concat (file-name-directory load-file-name)
-          "/resources/bell_multiple.wav")
-  "The path to a sound file that´s to be played when a long break is finished.")
+(defcustom org-pomodoro-long-break-sound
+  (concat (file-name-directory load-file-name) "/resources/bell_multiple.wav")
+  "The path to a sound file that´s to be played when a long break is finished."
+  :group 'org-pomodoro
+  :type 'file)
+
+(defcustom org-pomodoro-audio-player "/usr/bin/aplay"
+  "Music player used to play sounds."
+  :group 'org-pomodoro
+  :type 'string)
 
 ;; -----------------------------
 ;; Hooks
