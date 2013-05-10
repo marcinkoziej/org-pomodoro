@@ -128,6 +128,9 @@
 (defvar org-pomodoro-killed-hook nil
   "Hooks run when a pomodoro is killed.")
 
+;; -----------------------------
+;; Faces
+;; -----------------------------
 (defface org-pomodoro-mode-line
   '((t (:foreground "tomato1")))
   "Org Pomodoro mode line color"
@@ -136,6 +139,9 @@
 ;; -----------------------------
 ;; Temporary Variables
 ;; -----------------------------
+(defvar org-pomodoro-mode-line "")
+(put 'org-pomodoro-mode-line 'risky-local-variable t)
+
 (defvar org-pomodoro-timer nil
   "The timer while a pomodoro or a break.")
 
