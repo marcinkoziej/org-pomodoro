@@ -1,7 +1,36 @@
-;; BSD license
-;; Author: Marcin Koziej
-;; marcin at lolownia dot org
-;; website: https://github.com/lolownia/org-pomodoro
+;;; org-pomodoro.el --- Pomodoro implementation for org-mode.
+
+;; Author: Arthur Leonard Andersen <leoc.git@gmail.com>, Marcin Koziej <marcin at lolownia dot org>
+;; Created: May 10, 2013
+;; Version: 1.0
+
+;; This file is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
+
+;;; Commentary:
+
+;; Org-pomodoro introduces an easy way to clock time in org-mode with
+;; the pomodoro technique.  You can clock into tasks with starting a
+;; pomodoro time automatically.  Each finished pomodoro is followed by
+;; a pause timer.  If you completed 4 pomodoros in a row the pause is
+;; longer that the shorter pauses between each pomodoro.
+;;
+;; For a full explanation of the pomodoro technique, have a look at:
+;;   http://www.pomodorotechnique.com
+
+;;; Code:
 
 (require 'timer)
 (require 'org)
