@@ -3,6 +3,7 @@
 ;; Author: Arthur Leonard Andersen <leoc.git@gmail.com>, Marcin Koziej <marcin at lolownia dot org>
 ;; Created: May 10, 2013
 ;; Version: 1.0
+;; Package-Requires: ((alert "0.5.10"))
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -35,7 +36,7 @@
 (require 'timer)
 (require 'org)
 (require 'org-timer)
-(require 'notify)
+(require 'alert)
 
 ;; -----------------------------
 ;; Customizables
@@ -253,10 +254,10 @@ This may send a notification, play a sound and start a pomodoro break."
   (setq org-pomodoro-count (+ org-pomodoro-count 1))
   (if (> org-pomodoro-count org-pomodoro-long-break-frequency)
       (progn
-        (notify "Pomodoro finished" "Pomodoro completed! Time for a long break.")
+        (alert-message-notify "Pomodoro completed! Time for a long break.")
         (org-pomodoro-start :long-break))
     (progn
-      (notify "Pomodoro finished" "Pomodoro completed! Time for a short break.")
+      (alert-message-notify "Pomodoro completed! Time for a short break.")
       (org-pomodoro-start :short-break)))
   (run-hooks 'org-pomodoro-finished-hook)
   (org-pomodoro-update-mode-line))
@@ -265,7 +266,7 @@ This may send a notification, play a sound and start a pomodoro break."
 (defun org-pomodoro-killed ()
   "Is invoked when a pomodoro was killed.
 This may send a notification, play a sound and adds log."
-  (notify "Pomodoro killed" "One does not simply kill a pomodoro!")
+  (alert-message-notify "One does not simply kill a pomodoro!")
   (org-clock-cancel)
   (org-pomodoro-reset)
   (run-hooks 'org-pomodoro-killed-hook)
@@ -275,7 +276,7 @@ This may send a notification, play a sound and adds log."
 (defun org-pomodoro-short-break-finished ()
   "Is invoked when a break is finished.
 This may send a notification and play a sound."
-  (notify "Break finished" "Short break finished. Ready for another pomodoro?")
+  (alert-message-notify "Short break finished. Ready for another pomodoro?")
   (org-pomodoro-play-sound org-pomodoro-short-break-sound)
   (org-pomodoro-reset))
 
@@ -283,7 +284,7 @@ This may send a notification and play a sound."
 (defun org-pomodoro-long-break-finished ()
   "Is invoked when a long break is finished.
 This may send a notification and play a sound."
-  (notify "Break finished" "Long break finished. Ready for another pomodoro?")
+  (alert-message-notify "Long break finished. Ready for another pomodoro?")
   (org-pomodoro-play-sound org-pomodoro-long-break-sound)
   (setq org-pomodoro-count 0)
   (org-pomodoro-reset))
@@ -312,7 +313,6 @@ kill the current timer, this may be a break or a running pomodoro."
     (if (y-or-n-p "There is already a running timer.  Would you like to stop it? ")
         (org-pomodoro-kill)
       (message "Alright, keep up the good work!"))))
-
 
 (provide 'org-pomodoro)
 
