@@ -296,7 +296,7 @@ This may send a notification and play a sound."
 When no timer is running for `org-pomodoro` a new pomodoro is started and
 the current task is clocked in.  Otherwise EMACS will ask whether we´d like to
 kill the current timer, this may be a break or a running pomodoro."
-  (interactive "p")
+  (interactive)
   (if (equal org-pomodoro-state :none)
       (progn
         (cond
