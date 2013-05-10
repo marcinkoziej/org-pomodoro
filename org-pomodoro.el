@@ -163,8 +163,7 @@ or :break when starting a break.")
 (defun org-pomodoro-play-sound (sound)
   "Play an audio file specified by SOUND."
   (when (and org-pomodoro-play-sounds sound)
-    (play-sound-file sound)))
-
+    (call-process org-pomodoro-audio-player nil 0 nil (expand-file-name sound))))
 
 (defun org-pomodoro-minutes ()
   "Return the current countdown value in minutes as string."
@@ -288,7 +287,6 @@ This may send a notification and play a sound."
   (org-pomodoro-play-sound org-pomodoro-long-break-sound)
   (setq org-pomodoro-count 0)
   (org-pomodoro-reset))
-
 
 ;; ---------------------------------------
 ;; The actual function to handle pomodoros
