@@ -162,7 +162,7 @@ or :break when starting a break.")
 ;; -----------------------------
 (defun org-pomodoro-play-sound (sound)
   "Play an audio file specified by SOUND."
-  (when (and org-pomodoro-play-sounds sound)
+  (when (and org-pomodoro-play-sounds sound (executable-find org-pomodoro-audio-player))
     (call-process org-pomodoro-audio-player nil 0 nil (expand-file-name sound))))
 
 (defun org-pomodoro-minutes ()
