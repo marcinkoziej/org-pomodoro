@@ -248,7 +248,7 @@ The argument STATE is optional.  The default state is `:pomodoro`."
 (defun org-pomodoro-finished ()
   "Is invoked when a pomodoro was finished successfully.
 This may send a notification, play a sound and start a pomodoro break."
-  (org-clock-out)
+  (org-clock-out nil t)
   (org-pomodoro-play-sound org-pomodoro-sound)
   (setq org-pomodoro-count (+ org-pomodoro-count 1))
   (if (> org-pomodoro-count org-pomodoro-long-break-frequency)
