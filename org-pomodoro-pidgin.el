@@ -72,14 +72,16 @@ https://developer.pidgin.im/wiki/DbusHowto#CallingPidginmethods."
   "Call METHOD with D-Bus and execute HANDLER upon answer.
 
 ARGS lists additional parameters for METHOD."
-  (apply #'dbus-call-method-asynchronously
-   :session
-   "im.pidgin.purple.PurpleService"
-   "/im/pidgin/purple/PurpleObject"
-   "im.pidgin.purple.PurpleInterface"
-   method
-   handler
-   args))
+  (when
+      (member "im.pidgin.purple.PurpleService" (dbus-list-known-names :session))
+    (apply #'dbus-call-method-asynchronously
+         :session
+         "im.pidgin.purple.PurpleService"
+         "/im/pidgin/purple/PurpleObject"
+         "im.pidgin.purple.PurpleInterface"
+         method
+         handler
+         args)))
 
 (defun org-pompid--set-status-message (status message)
   "Update STATUS with the MESSAGE."
