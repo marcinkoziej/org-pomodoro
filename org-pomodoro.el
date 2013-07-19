@@ -292,6 +292,7 @@ This may send a notification and play a sound."
 ;; ---------------------------------------
 ;; The actual function to handle pomodoros
 ;; ---------------------------------------
+;;;###autoload
 (defun org-pomodoro ()
   "Start a new pomodoro or stop the current one.
 When no timer is running for `org-pomodoro` a new pomodoro is started and
