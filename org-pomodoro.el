@@ -266,7 +266,8 @@ This may send a notification, play a sound and start a pomodoro break."
   "Is invoked when a pomodoro was killed.
 This may send a notification, play a sound and adds log."
   (alert-message-notify "One does not simply kill a pomodoro!")
-  (org-clock-cancel)
+  (when (org-clocking-p)
+    (org-clock-cancel))
   (org-pomodoro-reset)
   (run-hooks 'org-pomodoro-killed-hook)
   (org-pomodoro-update-mode-line))
@@ -291,6 +292,7 @@ This may send a notification and play a sound."
 ;; ---------------------------------------
 ;; The actual function to handle pomodoros
 ;; ---------------------------------------
+;;;###autoload
 (defun org-pomodoro ()
   "Start a new pomodoro or stop the current one.
 When no timer is running for `org-pomodoro` a new pomodoro is started and
