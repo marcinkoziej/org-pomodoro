@@ -242,6 +242,10 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   (org-pomodoro-update-mode-line))
 
 
+(defun org-pomodoro-notify (title message)
+  "Send a notification with TITLE and MESSAGE using `alert'."
+  (alert message :title title :category 'org-pomodoro))
+
 ;; -----------------------------
 ;; Handlers for pomodoro events.
 ;; -----------------------------
@@ -253,10 +257,10 @@ This may send a notification, play a sound and start a pomodoro break."
   (setq org-pomodoro-count (+ org-pomodoro-count 1))
   (if (> org-pomodoro-count org-pomodoro-long-break-frequency)
       (progn
-        (alert-message-notify "Pomodoro completed! Time for a long break.")
+        (org-pomodoro-notify "Pomodoro completed!" "Time for a long break.")
         (org-pomodoro-start :long-break))
     (progn
-      (alert-message-notify "Pomodoro completed! Time for a short break.")
+      (org-pomodoro-notify "Pomodoro completed!" "Time for a short break.")
       (org-pomodoro-start :short-break)))
   (run-hooks 'org-pomodoro-finished-hook)
   (org-pomodoro-update-mode-line))
@@ -265,7 +269,7 @@ This may send a notification, play a sound and start a pomodoro break."
 (defun org-pomodoro-killed ()
   "Is invoked when a pomodoro was killed.
 This may send a notification, play a sound and adds log."
-  (alert-message-notify "One does not simply kill a pomodoro!")
+  (org-pomodoro-notify "Pomodoro killed." "One does not simply kill a pomodoro!")
   (when (org-clocking-p)
     (org-clock-cancel))
   (org-pomodoro-reset)
@@ -276,7 +280,7 @@ This may send a notification, play a sound and adds log."
 (defun org-pomodoro-short-break-finished ()
   "Is invoked when a break is finished.
 This may send a notification and play a sound."
-  (alert-message-notify "Short break finished. Ready for another pomodoro?")
+  (org-pomodoro-notify "Short break finished." "Ready for another pomodoro?")
   (org-pomodoro-play-sound org-pomodoro-short-break-sound)
   (org-pomodoro-reset))
 
@@ -284,7 +288,7 @@ This may send a notification and play a sound."
 (defun org-pomodoro-long-break-finished ()
   "Is invoked when a long break is finished.
 This may send a notification and play a sound."
-  (alert-message-notify "Long break finished. Ready for another pomodoro?")
+  (org-pomodoro-notify "Long break finished." "Ready for another pomodoro?")
   (org-pomodoro-play-sound org-pomodoro-long-break-sound)
   (setq org-pomodoro-count 0)
   (org-pomodoro-reset))
