@@ -14,7 +14,7 @@ starts a timer of 25 minutes and after each pomodoro a break timer of
 started with 20 minutes. All values are customizable.
 
 Installation
-===========
+============
 
  Install from MEPLA:
 
