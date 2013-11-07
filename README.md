@@ -10,7 +10,7 @@ With default customs:
 You can start a pomodoro for the task at point or select one of the
 last tasks that you has clocked time for. Each clocked in pomodoro
 starts a timer of 25 minutes and after each pomodoro a break timer of
-5 mionutes is started automatically. Every 4 breaks a long break is
+5 minutes is started automatically. Every 4 breaks a long break is
 started with 20 minutes. All values are customizable.
 
 Installation
