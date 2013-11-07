@@ -160,10 +160,16 @@ or :break when starting a break.")
 ;; -----------------------------
 ;; Helper Functions
 ;; -----------------------------
-(defun org-pomodoro-play-sound (sound)
-  "Play an audio file specified by SOUND."
-  (when (and org-pomodoro-play-sounds sound (executable-find org-pomodoro-audio-player))
-    (call-process org-pomodoro-audio-player nil 0 nil (expand-file-name sound))))
+(defun org-pomodoro-play-sound (type)
+  "Play an audio file specified by TYPE (:pomodoro, :short-break, :long-break)."
+  (let ((sound (pcase type
+                 (:pomodoro org-pomodoro-sound)
+                 (:short-break org-pomodoro-short-break-sound)
+                 (:long-break org-pomodoro-long-break-sound)
+                 (_ (error "Unknown org-pomodoro sound: %S" type)))))
+    (when (and org-pomodoro-play-sounds sound (executable-find org-pomodoro-audio-player))
+      (call-process org-pomodoro-audio-player nil 0 nil (expand-file-name sound)))))
+
 
 (defun org-pomodoro-minutes ()
   "Return the current countdown value in minutes as string."
@@ -253,7 +259,7 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   "Is invoked when a pomodoro was finished successfully.
 This may send a notification, play a sound and start a pomodoro break."
   (org-clock-out nil t)
-  (org-pomodoro-play-sound org-pomodoro-sound)
+  (org-pomodoro-play-sound :pomodoro)
   (setq org-pomodoro-count (+ org-pomodoro-count 1))
   (if (> org-pomodoro-count org-pomodoro-long-break-frequency)
       (progn
@@ -281,7 +287,7 @@ This may send a notification, play a sound and adds log."
   "Is invoked when a break is finished.
 This may send a notification and play a sound."
   (org-pomodoro-notify "Short break finished." "Ready for another pomodoro?")
-  (org-pomodoro-play-sound org-pomodoro-short-break-sound)
+  (org-pomodoro-play-sound :short-break)
   (org-pomodoro-reset))
 
 
@@ -289,7 +295,7 @@ This may send a notification and play a sound."
   "Is invoked when a long break is finished.
 This may send a notification and play a sound."
   (org-pomodoro-notify "Long break finished." "Ready for another pomodoro?")
-  (org-pomodoro-play-sound org-pomodoro-long-break-sound)
+  (org-pomodoro-play-sound :long-break)
   (setq org-pomodoro-count 0)
   (org-pomodoro-reset))
 
