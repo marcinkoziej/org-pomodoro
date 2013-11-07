@@ -35,6 +35,7 @@
 
 (require 'timer)
 (require 'org)
+(require 'org-clock)
 (require 'org-timer)
 (require 'alert)
 
