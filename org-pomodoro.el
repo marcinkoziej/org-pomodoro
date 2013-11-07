@@ -67,8 +67,8 @@
   :group 'org-pomodoro
   :type 'string)
 
-(defcustom org-pomodoro-sound
-  (concat (file-name-directory load-file-name) "/resources/bell.wav")
+(defcustom org-pomodoro-sound (when load-file-name
+                                (concat (file-name-directory load-file-name) "resources/bell.wav"))
   "The path to a sound file that´s to be played when a pomodoro was finished."
   :group 'org-pomodoro
   :type 'file)
@@ -89,8 +89,8 @@
   :group 'org-pomodoro
   :type 'string)
 
-(defcustom org-pomodoro-short-break-sound
-  (concat (file-name-directory load-file-name) "/resources/bell.wav")
+(defcustom org-pomodoro-short-break-sound (when load-file-name
+                                            (concat (file-name-directory load-file-name) "resources/bell.wav"))
   "The path to a sound file that´s to be played when a break was finished."
   :group 'org-pomodoro
   :type 'file)
@@ -106,8 +106,8 @@
   :group 'org-pomodoro
   :type 'string)
 
-(defcustom org-pomodoro-long-break-sound
-  (concat (file-name-directory load-file-name) "/resources/bell_multiple.wav")
+(defcustom org-pomodoro-long-break-sound (when load-file-name
+                                             (concat (file-name-directory load-file-name) "resources/bell_multiple.wav"))
   "The path to a sound file that´s to be played when a long break is finished."
   :group 'org-pomodoro
   :type 'file)
