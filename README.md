@@ -16,7 +16,7 @@ started with 20 minutes. All values are customizable.
 Installation
 ============
 
- Install from MEPLA:
+ Install from MELPA:
 
  * Add MELPA to your EMACS installation:
 
