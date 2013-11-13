@@ -113,7 +113,8 @@
   :group 'org-pomodoro
   :type 'file)
 
-(defcustom org-pomodoro-audio-player "/usr/bin/aplay"
+(defcustom org-pomodoro-audio-player (or (executable-find "aplay")
+                                         (executable-find "afplay"))
   "Music player used to play sounds."
   :group 'org-pomodoro
   :type 'string)
@@ -168,7 +169,7 @@ or :break when starting a break.")
                  (:short-break org-pomodoro-short-break-sound)
                  (:long-break org-pomodoro-long-break-sound)
                  (_ (error "Unknown org-pomodoro sound: %S" type)))))
-    (when (and org-pomodoro-play-sounds sound (executable-find org-pomodoro-audio-player))
+    (when (and org-pomodoro-play-sounds sound org-pomodoro-audio-player)
       (call-process org-pomodoro-audio-player nil 0 nil (expand-file-name sound)))))
 
 
