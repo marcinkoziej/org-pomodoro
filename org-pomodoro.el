@@ -63,6 +63,11 @@
   :group 'org-pomodoro
   :type 'integer)
 
+(defcustom org-pomodoro-time-format "%h:%.2m"
+  "Defines the format of the time representation in the modeline."
+  :group 'org-pomodoro
+  :type 'boolean)
+
 (defcustom org-pomodoro-format "Pomodoro~%s"
   "The format of the mode line string during a long break."
   :group 'org-pomodoro
@@ -182,11 +187,6 @@ or :break when starting a break.")
     (when (and org-pomodoro-play-sounds sound org-pomodoro-audio-player)
       (call-process org-pomodoro-audio-player nil 0 nil (expand-file-name sound)))))
 
-(defun org-pomodoro-minutes ()
-  "Return the current countdown value in minutes as string."
-  (let ((hms (org-timer-secs-to-hms org-pomodoro-countdown)))
-    (substring hms (- (length hms) 5))))
-
 (defun org-pomodoro-update-mode-line ()
   "Set the modeline accordingly to the current state."
   (setq org-pomodoro-mode-line
@@ -198,7 +198,8 @@ or :break when starting a break.")
                                    (:pomodoro org-pomodoro-format)
                                    (:short-break org-pomodoro-short-break-format)
                                    (:long-break org-pomodoro-long-break-format))
-                                 (org-pomodoro-minutes))
+                                 (format-seconds org-pomodoro-time-format
+                                                 org-pomodoro-countdown))
                          'face 'org-pomodoro-mode-line)
              "] ")
           nil))
