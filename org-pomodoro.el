@@ -131,6 +131,16 @@
 (defvar org-pomodoro-killed-hook nil
   "Hooks run when a pomodoro is killed.")
 
+(defvar org-pomodoro-break-finished-hook nil
+  "Hook run after any break has finished.
+Run before a break's specific hook.")
+
+(defvar org-pomodoro-long-break-finished-hook nil
+  "Hooks run when a long break is finished.")
+
+(defvar org-pomodoro-short-break-finished-hook nil
+  "Hooks run when short break is finished.")
+
 ;; -----------------------------
 ;; Faces
 ;; -----------------------------
@@ -290,6 +300,7 @@ This may send a notification, play a sound and adds log."
 This may send a notification and play a sound."
   (org-pomodoro-notify "Short break finished." "Ready for another pomodoro?")
   (org-pomodoro-play-sound :short-break)
+  (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-short-break-finished-hook)
   (org-pomodoro-reset))
 
 
@@ -299,6 +310,7 @@ This may send a notification and play a sound."
   (org-pomodoro-notify "Long break finished." "Ready for another pomodoro?")
   (org-pomodoro-play-sound :long-break)
   (setq org-pomodoro-count 0)
+  (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-long-break-finished-hook)
   (org-pomodoro-reset))
 
 ;; ---------------------------------------
