@@ -296,13 +296,10 @@ This may send a notification, play a sound and start a pomodoro break."
   (org-clock-out nil t)
   (org-pomodoro-play-sound :pomodoro)
   (setq org-pomodoro-count (+ org-pomodoro-count 1))
-  (if (> org-pomodoro-count org-pomodoro-long-break-frequency)
-      (progn
-        (org-pomodoro-notify "Pomodoro completed!" "Time for a long break.")
-        (org-pomodoro-start :long-break))
-    (progn
-      (org-pomodoro-notify "Pomodoro completed!" "Time for a short break.")
-      (org-pomodoro-start :short-break)))
+  (if (zerop (mod org-pomodoro-count org-pomodoro-long-break-frequency))
+      (org-pomodoro-start :long-break)
+    (org-pomodoro-start :short-break))
+  (org-pomodoro-notify "Pomodoro completed!" "Time for a break.")
   (run-hooks 'org-pomodoro-finished-hook)
   (org-pomodoro-update-mode-line))
 
@@ -329,7 +326,6 @@ This may send a notification and play a sound."
 This may send a notification and play a sound."
   (org-pomodoro-notify "Long break finished." "Ready for another pomodoro?")
   (org-pomodoro-play-sound :long-break)
-  (setq org-pomodoro-count 0)
   (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-long-break-finished-hook)
   (org-pomodoro-reset))
 
