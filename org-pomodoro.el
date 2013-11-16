@@ -56,6 +56,11 @@
   :group 'org-pomodoro
   :type 'boolean)
 
+(defcustom org-pomodoro-play-ticking-sounds nil
+  "Determines whether ticking clock sounds are played or not."
+  :group 'org-pomodoro
+  :type 'boolean)
+
 ;; Pomodoro Values
 
 (defcustom org-pomodoro-length 25
@@ -72,6 +77,12 @@
   "The format of the mode line string during a long break."
   :group 'org-pomodoro
   :type 'string)
+
+(defcustom org-pomodoro-ticking-sound (when load-file-name
+                                        (concat (file-name-directory load-file-name) "resources/tick.wav"))
+  "The path to a sound file that´s to be played while a pomodoro is running."
+  :group 'org-pomodoro
+  :type 'file)
 
 (defcustom org-pomodoro-sound (when load-file-name
                                 (concat (file-name-directory load-file-name) "resources/bell.wav"))
@@ -252,6 +263,12 @@ invokes the handlers for finishing."
           (:pomodoro (org-pomodoro-finished))
           (:short-break (org-pomodoro-short-break-finished))
           (:long-break (org-pomodoro-long-break-finished))))))
+  (when (and org-pomodoro-play-sounds
+             org-pomodoro-play-ticking-sounds
+             org-pomodoro-audio-player
+             org-pomodoro-ticking-sound)
+        (call-process org-pomodoro-audio-player nil 0 nil
+                      (expand-file-name org-pomodoro-ticking-sound)))
   (org-pomodoro-update-mode-line))
 
 (defun org-pomodoro-start (&optional state)
