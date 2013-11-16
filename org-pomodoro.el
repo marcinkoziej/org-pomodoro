@@ -63,7 +63,7 @@
   :group 'org-pomodoro
   :type 'integer)
 
-(defcustom org-pomodoro-time-format "%h:%.2m"
+(defcustom org-pomodoro-time-format "%.2m:%.2s"
   "Defines the format of the time representation in the modeline."
   :group 'org-pomodoro
   :type 'boolean)
