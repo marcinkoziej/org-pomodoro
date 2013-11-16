@@ -202,7 +202,7 @@ or :break when starting a break.")
 
 (defun org-pomodoro-update-mode-line ()
   "Set the modeline accordingly to the current state."
-  (let ((s (case org-pomodoro-state
+  (let ((s (cl-case org-pomodoro-state
              (:pomodoro
               (propertize org-pomodoro-format 'face 'org-pomodoro-mode-line))
              (:short-break
@@ -231,7 +231,7 @@ invokes the handlers for finishing."
     (progn
       (setq org-pomodoro-countdown (- org-pomodoro-countdown 1))
       (when (< org-pomodoro-countdown 1)
-        (case org-pomodoro-state
+        (cl-case org-pomodoro-state
           (:pomodoro (org-pomodoro-finished))
           (:short-break (org-pomodoro-short-break-finished))
           (:long-break (org-pomodoro-long-break-finished))))))
@@ -250,7 +250,7 @@ The argument STATE is optional.  The default state is `:pomodoro`."
 
   (unless state (setq state :pomodoro))
   (setq org-pomodoro-state state
-        org-pomodoro-countdown (case state
+        org-pomodoro-countdown (cl-case state
                                  (:pomodoro (* 60 org-pomodoro-length))
                                  (:short-break (* 60 org-pomodoro-short-break-length))
                                  (:long-break (* 60 org-pomodoro-long-break-length)))
