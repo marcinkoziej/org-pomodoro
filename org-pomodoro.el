@@ -84,6 +84,13 @@
   :group 'org-pomodoro
   :type 'file)
 
+(defcustom org-pomodoro-expiry-time 120
+  "The time in minutes for which a pomodoro group is valid.
+If you do not clock in for this period of time you will be prompted
+whether to reset the pomodoro count next time you call `org-pomodoro'."
+  :group 'org-pomodoro
+  :type 'integer)
+
 ;; Break Values
 
 (defcustom org-pomodoro-short-break-length 5
@@ -178,6 +185,9 @@ or :break when starting a break.")
 (defvar org-pomodoro-count 0
   "The number of pomodoros since the last long break.")
 
+(defvar org-pomodoro-last-clock-in nil
+  "The last time the pomodoro was set.")
+
 ;;; Internal
 
 ;; Helper Functions
@@ -185,6 +195,13 @@ or :break when starting a break.")
 (defun org-pomodoro-active-p ()
   "Retrieve whether org-pomodoro is active or not."
   (not (eq org-pomodoro-state :none)))
+
+(defun org-pomodoro-expires-p ()
+  "Return true when the last clock-in was more than `org-pomodoro-expiry-time`."
+  (let* ((current-time-secs (nth 1 (current-time)))
+         (last-clock-in-secs (nth 1 org-pomodoro-last-clock-in))
+         (delta-minutes (/ (- current-time-secs last-clock-in-secs) 60)))
+    (< org-pomodoro-expiry-time delta-minutes)))
 
 (defun org-pomodoro-play-sound (type)
   "Play an audio file specified by TYPE (:pomodoro, :short-break, :long-break)."
@@ -323,6 +340,14 @@ When no timer is running for `org-pomodoro` a new pomodoro is started and
 the current task is clocked in.  Otherwise EMACS will ask whether we´d like to
 kill the current timer, this may be a break or a running pomodoro."
   (interactive)
+
+  (when (and org-pomodoro-last-clock-in
+             org-pomodoro-expiry-time
+             (org-pomodoro-expires-p)
+             (y-or-n-p "Reset pomodoro count? "))
+    (setq org-pomodoro-count 0))
+  (setq org-pomodoro-last-clock-in (current-time))
+
   (if (equal org-pomodoro-state :none)
       (progn
         (cond
