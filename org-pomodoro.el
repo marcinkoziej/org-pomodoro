@@ -39,9 +39,8 @@
 (require 'org-timer)
 (require 'alert)
 
-;; -----------------------------
-;; Customizables
-;; -----------------------------
+;;; Custom Variables
+
 (defgroup org-pomodoro nil
   "Org pomodoro customization"
   :tag "Org Pomodoro"
@@ -57,7 +56,8 @@
   :group 'org-pomodoro
   :type 'boolean)
 
-;; POMODORO VALUES
+;; Pomodoro Values
+
 (defcustom org-pomodoro-length 25
   "The length of a pomodoro in minutes."
   :group 'org-pomodoro
@@ -79,7 +79,8 @@
   :group 'org-pomodoro
   :type 'file)
 
-;; SHORT BREAK VALUES
+;; Break Values
+
 (defcustom org-pomodoro-short-break-length 5
   "The length of a break in minutes."
   :group 'org-pomodoro
@@ -91,12 +92,12 @@
   :type 'string)
 
 (defcustom org-pomodoro-short-break-sound (when load-file-name
-                                            (concat (file-name-directory load-file-name) "resources/bell.wav"))
+                                            (concat (file-name-directory load-file-name)
+                                                    "resources/bell.wav"))
   "The path to a sound file that´s to be played when a break was finished."
   :group 'org-pomodoro
   :type 'file)
 
-;; LONG BREAK VALUES
 (defcustom org-pomodoro-long-break-length 20
   "The length of a long break in minutes."
   :group 'org-pomodoro
@@ -108,7 +109,8 @@
   :type 'string)
 
 (defcustom org-pomodoro-long-break-sound (when load-file-name
-                                             (concat (file-name-directory load-file-name) "resources/bell_multiple.wav"))
+                                           (concat (file-name-directory load-file-name)
+                                                   "resources/bell_multiple.wav"))
   "The path to a sound file that´s to be played when a long break is finished."
   :group 'org-pomodoro
   :type 'file)
@@ -119,9 +121,8 @@
   :group 'org-pomodoro
   :type 'string)
 
-;; -----------------------------
 ;; Hooks
-;; -----------------------------
+
 (defvar org-pomodoro-started-hook nil
   "Hooks run when a pomodoro is started.")
 
@@ -141,17 +142,15 @@ Run before a break's specific hook.")
 (defvar org-pomodoro-short-break-finished-hook nil
   "Hooks run when short break is finished.")
 
-;; -----------------------------
 ;; Faces
-;; -----------------------------
+
 (defface org-pomodoro-mode-line
   '((t (:foreground "tomato1")))
   "Org Pomodoro mode line color"
   :group 'faces)
 
-;; -----------------------------
 ;; Temporary Variables
-;; -----------------------------
+
 (defvar org-pomodoro-mode-line "")
 (put 'org-pomodoro-mode-line 'risky-local-variable t)
 
@@ -169,9 +168,10 @@ or :break when starting a break.")
 (defvar org-pomodoro-count 0
   "The number of pomodoros since the last long break.")
 
-;; -----------------------------
+;;; Internal
+
 ;; Helper Functions
-;; -----------------------------
+
 (defun org-pomodoro-play-sound (type)
   "Play an audio file specified by TYPE (:pomodoro, :short-break, :long-break)."
   (let ((sound (pcase type
@@ -182,12 +182,10 @@ or :break when starting a break.")
     (when (and org-pomodoro-play-sounds sound org-pomodoro-audio-player)
       (call-process org-pomodoro-audio-player nil 0 nil (expand-file-name sound)))))
 
-
 (defun org-pomodoro-minutes ()
   "Return the current countdown value in minutes as string."
   (let ((hms (org-timer-secs-to-hms org-pomodoro-countdown)))
     (substring hms (- (length hms) 5))))
-
 
 (defun org-pomodoro-update-mode-line ()
   "Set the modeline accordingly to the current state."
@@ -206,12 +204,10 @@ or :break when starting a break.")
           nil))
   (force-mode-line-update))
 
-
 (defun org-pomodoro-kill ()
   "Kill the current timer, reset the phase and update the modeline."
   (org-pomodoro-reset)
   (org-pomodoro-killed))
-
 
 (defun org-pomodoro-tick ()
   "A callback that is invoked by the running timer each second.
@@ -228,7 +224,6 @@ invokes the handlers for finishing."
           (:long-break (org-pomodoro-long-break-finished))))))
   (org-pomodoro-update-mode-line))
 
-
 (defun org-pomodoro-start (&optional state)
   "Start the `org-pomodoro` timer.
 The argument STATE is optional.  The default state is `:pomodoro`."
@@ -239,6 +234,7 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   (unless (memq 'org-pomodoro-mode-line global-mode-string)
     (setq global-mode-string (append global-mode-string
                                      '(org-pomodoro-mode-line))))
+
   (unless state (setq state :pomodoro))
   (setq org-pomodoro-state state
         org-pomodoro-countdown (case state
@@ -250,7 +246,6 @@ The argument STATE is optional.  The default state is `:pomodoro`."
     (run-hooks 'org-pomodoro-started-hook))
   (org-pomodoro-update-mode-line))
 
-
 (defun org-pomodoro-reset ()
   "Reset the org-pomodoro state."
   (when org-pomodoro-timer
@@ -259,14 +254,12 @@ The argument STATE is optional.  The default state is `:pomodoro`."
         org-pomodoro-countdown 0)
   (org-pomodoro-update-mode-line))
 
-
 (defun org-pomodoro-notify (title message)
   "Send a notification with TITLE and MESSAGE using `alert'."
   (alert message :title title :category 'org-pomodoro))
 
-;; -----------------------------
 ;; Handlers for pomodoro events.
-;; -----------------------------
+
 (defun org-pomodoro-finished ()
   "Is invoked when a pomodoro was finished successfully.
 This may send a notification, play a sound and start a pomodoro break."
@@ -283,7 +276,6 @@ This may send a notification, play a sound and start a pomodoro break."
   (run-hooks 'org-pomodoro-finished-hook)
   (org-pomodoro-update-mode-line))
 
-
 (defun org-pomodoro-killed ()
   "Is invoked when a pomodoro was killed.
 This may send a notification, play a sound and adds log."
@@ -294,7 +286,6 @@ This may send a notification, play a sound and adds log."
   (run-hooks 'org-pomodoro-killed-hook)
   (org-pomodoro-update-mode-line))
 
-
 (defun org-pomodoro-short-break-finished ()
   "Is invoked when a break is finished.
 This may send a notification and play a sound."
@@ -302,7 +293,6 @@ This may send a notification and play a sound."
   (org-pomodoro-play-sound :short-break)
   (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-short-break-finished-hook)
   (org-pomodoro-reset))
-
 
 (defun org-pomodoro-long-break-finished ()
   "Is invoked when a long break is finished.
@@ -313,9 +303,6 @@ This may send a notification and play a sound."
   (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-long-break-finished-hook)
   (org-pomodoro-reset))
 
-;; ---------------------------------------
-;; The actual function to handle pomodoros
-;; ---------------------------------------
 ;;;###autoload
 (defun org-pomodoro ()
   "Start a new pomodoro or stop the current one.
