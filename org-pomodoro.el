@@ -151,7 +151,12 @@ Run before a break's specific hook.")
 
 (defface org-pomodoro-mode-line
   '((t (:foreground "tomato1")))
-  "Org Pomodoro mode line color"
+  "Face of a pomodoro in the modeline."
+  :group 'faces)
+
+(defface org-pomodoro-mode-line-break
+  '((t (:foreground "#2aa198")))
+  "Face of a pomodoro break in the modeline ."
   :group 'faces)
 
 ;; Temporary Variables
@@ -177,6 +182,10 @@ or :break when starting a break.")
 
 ;; Helper Functions
 
+(defun org-pomodoro-active-p ()
+  "Retrieve whether org-pomodoro is active or not."
+  (not (eq org-pomodoro-state :none)))
+
 (defun org-pomodoro-play-sound (type)
   "Play an audio file specified by TYPE (:pomodoro, :short-break, :long-break)."
   (let ((sound (pcase type
@@ -187,22 +196,25 @@ or :break when starting a break.")
     (when (and org-pomodoro-play-sounds sound org-pomodoro-audio-player)
       (call-process org-pomodoro-audio-player nil 0 nil (expand-file-name sound)))))
 
+(defun org-pomodoro-format-seconds ()
+  "Format the countdown with the format specified in org-pomodoro-time-format."
+  (format-seconds org-pomodoro-time-format org-pomodoro-countdown))
+
 (defun org-pomodoro-update-mode-line ()
   "Set the modeline accordingly to the current state."
-  (setq org-pomodoro-mode-line
-        (if (not (eq org-pomodoro-state :none))
-            (list
-             "["
-             (propertize (format (case org-pomodoro-state
-                                   (:none "")
-                                   (:pomodoro org-pomodoro-format)
-                                   (:short-break org-pomodoro-short-break-format)
-                                   (:long-break org-pomodoro-long-break-format))
-                                 (format-seconds org-pomodoro-time-format
-                                                 org-pomodoro-countdown))
-                         'face 'org-pomodoro-mode-line)
-             "] ")
-          nil))
+  (let ((s (case org-pomodoro-state
+             (:pomodoro
+              (propertize org-pomodoro-format 'face 'org-pomodoro-mode-line))
+             (:short-break
+              (propertize org-pomodoro-short-break-format
+                          'face 'org-pomodoro-mode-line-break))
+             (:long-break
+              (propertize org-pomodoro-long-break-format
+                          'face 'org-pomodoro-mode-line-break)))))
+    (setq org-pomodoro-mode-line
+          (if (org-pomodoro-active-p)
+              (list "[" (format s (org-pomodoro-format-seconds)) "] ")
+            nil)))
   (force-mode-line-update))
 
 (defun org-pomodoro-kill ()
