@@ -266,7 +266,8 @@ invokes the handlers for finishing."
   (when (and org-pomodoro-play-sounds
              org-pomodoro-play-ticking-sounds
              org-pomodoro-audio-player
-             org-pomodoro-ticking-sound)
+             org-pomodoro-ticking-sound
+             (eq :pomodoro org-pomodoro-state))
         (call-process org-pomodoro-audio-player nil 0 nil
                       (expand-file-name org-pomodoro-ticking-sound)))
   (org-pomodoro-update-mode-line))
