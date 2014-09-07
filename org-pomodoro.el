@@ -71,7 +71,7 @@
 (defcustom org-pomodoro-time-format "%.2m:%.2s"
   "Defines the format of the time representation in the modeline."
   :group 'org-pomodoro
-  :type 'boolean)
+  :type 'string)
 
 (defcustom org-pomodoro-format "Pomodoro~%s"
   "The format of the mode line string during a long break."
