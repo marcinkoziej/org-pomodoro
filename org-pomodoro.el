@@ -84,16 +84,31 @@
   :group 'org-pomodoro
   :type 'file)
 
+(defcustom org-pomodoro-ticking-sound-args nil
+  "The volume for the ticking sound."
+  :group 'org-pomodoro
+  :type 'string)
+
 (defcustom org-pomodoro-sound (when load-file-name
                                 (concat (file-name-directory load-file-name) "resources/bell.wav"))
   "The path to a sound file that´s to be played when a pomodoro was finished."
   :group 'org-pomodoro
   :type 'file)
 
+(defcustom org-pomodoro-sound-args nil
+  "The volume for the pomodoro sound."
+  :group 'org-pomodoro
+  :type 'string)
+
 (defcustom org-pomodoro-killed-sound nil
   "The path to a sound file, that´s to be played when a pomodoro is killed."
   :group 'org-pomodoro
   :type 'file)
+
+(defcustom org-pomodoro-killed-sound-args nil
+  "The args for the pomodoro sound."
+  :group 'org-pomodoro
+  :type 'string)
 
 (defcustom org-pomodoro-expiry-time 120
   "The time in minutes for which a pomodoro group is valid.
@@ -121,6 +136,11 @@ whether to reset the pomodoro count next time you call `org-pomodoro'."
   :group 'org-pomodoro
   :type 'file)
 
+(defcustom org-pomodoro-short-break-sound-args nil
+  "The args for the short-break sound."
+  :group 'org-pomodoro
+  :type 'string)
+
 (defcustom org-pomodoro-long-break-length 20
   "The length of a long break in minutes."
   :group 'org-pomodoro
@@ -137,6 +157,11 @@ whether to reset the pomodoro count next time you call `org-pomodoro'."
   "The path to a sound file that´s to be played when a long break is finished."
   :group 'org-pomodoro
   :type 'file)
+
+(defcustom org-pomodoro-long-break-sound-args nil
+  "The args for the long-break sound."
+  :group 'org-pomodoro
+  :type 'string)
 
 (defcustom org-pomodoro-audio-player (or (executable-find "aplay")
                                          (executable-find "afplay"))
@@ -218,11 +243,18 @@ or :break when starting a break.")
   "Play an audio file specified by TYPE (:pomodoro, :short-break, :long-break)."
   (let ((sound (cl-case type
                  (:pomodoro org-pomodoro-sound)
+                 (:killed org-pomodoro-killed-sound)
                  (:short-break org-pomodoro-short-break-sound)
                  (:long-break org-pomodoro-long-break-sound)
-                 (t (error "Unknown org-pomodoro sound: %S" type)))))
+                 (t (error "Unknown org-pomodoro sound: %S" type))))
+        (args (cl-case type
+                  (:pomodoro org-pomodoro-sound-args)
+                  (:killed org-pomodoro-killed-sound-args)
+                  (:short-break org-pomodoro-short-break-sound-args)
+                  (:long-break org-pomodoro-long-break-sound-args)
+                  (t (error "Unknown org-pomodoro sound: %S" type)))))
     (when (and org-pomodoro-play-sounds sound org-pomodoro-audio-player)
-      (call-process org-pomodoro-audio-player nil 0 nil (expand-file-name sound)))))
+      (apply 'call-process `(,org-pomodoro-audio-player nil 0 nil ,@(delq nil (list sound args)))))))
 
 (defun org-pomodoro-format-seconds ()
   "Format the countdown with the format specified in org-pomodoro-time-format."
