@@ -280,7 +280,7 @@ or :break when starting a break.")
           (if (org-pomodoro-active-p)
               (list "[" (format s (org-pomodoro-format-seconds)) "] ")
             nil)))
-  (force-mode-line-update))
+  (force-mode-line-update t))
 
 (defun org-pomodoro-kill ()
   "Kill the current timer, reset the phase and update the modeline."
