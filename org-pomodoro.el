@@ -171,6 +171,9 @@ whether to reset the pomodoro count next time you call `org-pomodoro'."
 
 ;; Hooks
 
+(defvar org-pomodoro-tick-hook nil
+  "Hooks run every second during a pomodoro.")
+
 (defvar org-pomodoro-started-hook nil
   "Hooks run when a pomodoro is started.")
 
@@ -297,10 +300,11 @@ invokes the handlers for finishing."
           (:pomodoro (org-pomodoro-finished))
           (:short-break (org-pomodoro-short-break-finished))
           (:long-break (org-pomodoro-long-break-finished))))))
-  (when (and (eq :pomodoro org-pomodoro-state)
-             org-pomodoro-play-ticking-sounds)
-    (org-pomodoro-play-sound :tick))
-  (org-pomodoro-update-mode-line))
+  (when (eq :pomodoro org-pomodoro-state)
+    (run-hooks 'org-pomodoro-tick-hook)
+    (org-pomodoro-update-mode-line)
+    (when org-pomodoro-play-ticking-sounds
+      (org-pomodoro-play-sound :tick))))
 
 (defun org-pomodoro-start (&optional state)
   "Start the `org-pomodoro` timer.
