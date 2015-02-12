@@ -246,12 +246,14 @@ or :break when starting a break.")
                  (:killed org-pomodoro-killed-sound)
                  (:short-break org-pomodoro-short-break-sound)
                  (:long-break org-pomodoro-long-break-sound)
+                 (:tick org-pomodoro-ticking-sound)
                  (t (error "Unknown org-pomodoro sound: %S" type))))
         (args (cl-case type
                   (:pomodoro org-pomodoro-sound-args)
                   (:killed org-pomodoro-killed-sound-args)
                   (:short-break org-pomodoro-short-break-sound-args)
                   (:long-break org-pomodoro-long-break-sound-args)
+                  (:tick org-pomodoro-ticking-sound-args)
                   (t (error "Unknown org-pomodoro sound: %S" type)))))
     (when (and org-pomodoro-play-sounds sound org-pomodoro-audio-player)
       (apply 'call-process `(,org-pomodoro-audio-player nil 0 nil ,@(delq nil (list sound args)))))))
@@ -295,13 +297,9 @@ invokes the handlers for finishing."
           (:pomodoro (org-pomodoro-finished))
           (:short-break (org-pomodoro-short-break-finished))
           (:long-break (org-pomodoro-long-break-finished))))))
-  (when (and org-pomodoro-play-sounds
-             org-pomodoro-play-ticking-sounds
-             org-pomodoro-audio-player
-             org-pomodoro-ticking-sound
-             (eq :pomodoro org-pomodoro-state))
-        (call-process org-pomodoro-audio-player nil 0 nil
-                      (expand-file-name org-pomodoro-ticking-sound)))
+  (when (and (eq :pomodoro org-pomodoro-state)
+             org-pomodoro-play-ticking-sounds)
+    (org-pomodoro-play-sound :tick))
   (org-pomodoro-update-mode-line))
 
 (defun org-pomodoro-start (&optional state)
