@@ -259,7 +259,12 @@ or :break when starting a break.")
                   (:tick org-pomodoro-ticking-sound-args)
                   (t (error "Unknown org-pomodoro sound: %S" type)))))
     (when (and org-pomodoro-play-sounds sound org-pomodoro-audio-player)
-      (apply 'call-process `(,org-pomodoro-audio-player nil 0 nil ,@(delq nil (list sound args)))))))
+      (start-process-shell-command
+       "org-pomodoro-audio-player" nil
+       (mapconcat 'identity
+                  `(,org-pomodoro-audio-player
+                    ,@(delq nil (list args (shell-quote-argument sound))))
+                  " ")))))
 
 (defun org-pomodoro-format-seconds ()
   "Format the countdown with the format specified in org-pomodoro-time-format."
