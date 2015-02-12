@@ -85,7 +85,9 @@
   :type 'file)
 
 (defcustom org-pomodoro-ticking-sound-args nil
-  "The volume for the ticking sound."
+  "The volume for the ticking sound.
+
+Please note, that you have to escape the argument values yourself."
   :group 'org-pomodoro
   :type 'string)
 
@@ -96,7 +98,9 @@
   :type 'file)
 
 (defcustom org-pomodoro-sound-args nil
-  "The volume for the pomodoro sound."
+  "The volume for the pomodoro sound.
+
+Please note, that you have to escape the argument values yourself."
   :group 'org-pomodoro
   :type 'string)
 
@@ -106,7 +110,9 @@
   :type 'file)
 
 (defcustom org-pomodoro-killed-sound-args nil
-  "The args for the pomodoro sound."
+  "The args for the pomodoro sound.
+
+Please note, that you have to escape the argument values yourself."
   :group 'org-pomodoro
   :type 'string)
 
@@ -137,7 +143,9 @@ whether to reset the pomodoro count next time you call `org-pomodoro'."
   :type 'file)
 
 (defcustom org-pomodoro-short-break-sound-args nil
-  "The args for the short-break sound."
+  "The args for the short-break sound.
+
+Please note, that you have to escape the argument values yourself."
   :group 'org-pomodoro
   :type 'string)
 
@@ -159,7 +167,9 @@ whether to reset the pomodoro count next time you call `org-pomodoro'."
   :type 'file)
 
 (defcustom org-pomodoro-long-break-sound-args nil
-  "The args for the long-break sound."
+  "The args for the long-break sound.
+
+Please note, that you have to escape the argument values yourself."
   :group 'org-pomodoro
   :type 'string)
 
