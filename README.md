@@ -1,3 +1,6 @@
+[![MELPA Stable](http://stable.melpa.org/packages/org-pomodoro-badge.svg)](http://stable.melpa.org/#/org-pomodoro)
+[![MELPA](http://melpa.org/packages/org-pomodoro-badge.svg)](http://melpa.org/#/org-pomodoro)
+
 Org-Pomodoro
 ============
 
