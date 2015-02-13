@@ -179,6 +179,11 @@ Please note, that you have to escape the argument values yourself."
   :group 'org-pomodoro
   :type 'string)
 
+(defcustom org-pomodoro-keep-killed-pomodoro-time nil
+  "Keeps the clocked time of killed pomodoros."
+  :group 'org-pomodoro
+  :type 'boolean)
+
 ;; Hooks
 
 (defvar org-pomodoro-tick-hook nil
@@ -375,7 +380,9 @@ This may send a notification, play a sound and start a pomodoro break."
 This may send a notification, play a sound and adds log."
   (org-pomodoro-notify "Pomodoro killed." "One does not simply kill a pomodoro!")
   (when (org-clocking-p)
-    (org-clock-cancel))
+    (if org-pomodoro-keep-killed-pomodoro-time
+        (org-clock-out nil t)
+      (org-clock-cancel)))
   (org-pomodoro-reset)
   (run-hooks 'org-pomodoro-killed-hook)
   (org-pomodoro-update-mode-line))
