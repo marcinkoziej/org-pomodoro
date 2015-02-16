@@ -320,7 +320,7 @@ invokes the handlers for finishing."
           (:pomodoro (org-pomodoro-finished))
           (:short-break (org-pomodoro-short-break-finished))
           (:long-break (org-pomodoro-long-break-finished))))))
-  (when (eq :pomodoro org-pomodoro-state)
+  (when (not (eq :none org-pomodoro-state))
     (run-hooks 'org-pomodoro-tick-hook)
     (org-pomodoro-update-mode-line)
     (when org-pomodoro-play-ticking-sounds
