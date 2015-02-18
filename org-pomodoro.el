@@ -51,6 +51,11 @@
   :group 'org-pomodoro
   :type 'integer)
 
+(defcustom org-pomodoro-ask-upon-killing t
+  "Determines whether to ask upon killing a pomodoro or not."
+  :group 'org-pomodoro
+  :type 'boolean)
+
 (defcustom org-pomodoro-play-sounds t
   "Determines whether sounds are played or not."
   :group 'org-pomodoro
@@ -429,7 +434,8 @@ kill the current timer, this may be a break or a running pomodoro."
          (t (let ((current-prefix-arg '(4)))
               (call-interactively 'org-clock-in))))
         (org-pomodoro-start :pomodoro))
-    (if (y-or-n-p "There is already a running timer.  Would you like to stop it? ")
+    (if (or (not org-pomodoro-ask-upon-killing)
+            (y-or-n-p "There is already a running timer.  Would you like to stop it? "))
         (org-pomodoro-kill)
       (message "Alright, keep up the good work!"))))
 
