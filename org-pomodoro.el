@@ -408,6 +408,19 @@ This may send a notification and play a sound."
   (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-long-break-finished-hook)
   (org-pomodoro-reset))
 
+(defun org-pomodoro-extend-last-clock ()
+  "Extends last clock to `current-time'."
+  (save-window-excursion
+    (let ((last-clock (car org-clock-history)))
+      (switch-to-buffer (marker-buffer last-clock))
+      (goto-char last-clock)
+      (let ((item-end (save-excursion (org-end-of-subtree t))))
+        (when (re-search-forward "CLOCK: \\(\\[.*?\\]\\)" item-end t)
+          (kill-line)
+          (org-clock-clock-out
+           (cons (copy-marker (match-end 1) t)
+                 (org-time-string-to-time (match-string 1)))))))))
+
 ;;;###autoload
 (defun org-pomodoro ()
   "Start a new pomodoro or stop the current one.
