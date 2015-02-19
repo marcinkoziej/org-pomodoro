@@ -3,7 +3,7 @@
 ;; Author: Arthur Leonard Andersen <leoc.git@gmail.com>, Marcin Koziej <marcin at lolownia dot org>
 ;; Created: May 10, 2013
 ;; Version: 1.6.0
-;; Package-Requires: ((alert "0.5.10"))
+;; Package-Requires: ((alert "0.5.10") (cl-lib "0.5"))
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 (require 'org-clock)
 (require 'org-timer)
 (require 'alert)
+(require 'cl-lib)
 
 ;;; Custom Variables
 
