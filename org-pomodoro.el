@@ -409,6 +409,7 @@ This may send a notification and play a sound."
 
 (defun org-pomodoro-extend-last-clock ()
   "Extends last clock to `current-time'."
+  (interactive)
   (save-window-excursion
     (let ((last-clock (car org-clock-history)))
       (switch-to-buffer (marker-buffer last-clock))
