@@ -303,9 +303,8 @@ or :break when starting a break.")
               (propertize org-pomodoro-long-break-format
                           'face 'org-pomodoro-mode-line-break)))))
     (setq org-pomodoro-mode-line
-          (if (org-pomodoro-active-p)
-              (list "[" (format s (org-pomodoro-format-seconds)) "] ")
-            nil)))
+          (when (org-pomodoro-active-p)
+            (list "[" (format s (org-pomodoro-format-seconds)) "] "))))
   (force-mode-line-update t))
 
 (defun org-pomodoro-kill ()
@@ -317,7 +316,7 @@ or :break when starting a break.")
   "A callback that is invoked by the running timer each second.
 It checks whether we reached the duration of the current phase, when 't it
 invokes the handlers for finishing."
-  (if (and (equal org-pomodoro-state :none) org-pomodoro-timer)
+  (if (and (not (org-pomodoro-active-p)) org-pomodoro-timer)
       (org-pomodoro-reset)
     (progn
       (setq org-pomodoro-countdown (- org-pomodoro-countdown 1))
@@ -326,7 +325,7 @@ invokes the handlers for finishing."
           (:pomodoro (org-pomodoro-finished))
           (:short-break (org-pomodoro-short-break-finished))
           (:long-break (org-pomodoro-long-break-finished))))))
-  (when (not (eq :none org-pomodoro-state))
+  (when (org-pomodoro-active-p)
     (run-hooks 'org-pomodoro-tick-hook)
     (org-pomodoro-update-mode-line)
     (when org-pomodoro-play-ticking-sounds
@@ -437,21 +436,20 @@ kill the current timer, this may be a break or a running pomodoro."
     (setq org-pomodoro-count 0))
   (setq org-pomodoro-last-clock-in (current-time))
 
-  (if (equal org-pomodoro-state :none)
-      (progn
-        (cond
-         ((eq major-mode 'org-mode)
-          (call-interactively 'org-clock-in))
-         ((eq major-mode 'org-agenda-mode)
-          (org-with-point-at (org-get-at-bol 'org-hd-marker)
-            (call-interactively 'org-clock-in)))
-         (t (let ((current-prefix-arg '(4)))
-              (call-interactively 'org-clock-in))))
-        (org-pomodoro-start :pomodoro))
-    (if (or (not org-pomodoro-ask-upon-killing)
-            (y-or-n-p "There is already a running timer.  Would you like to stop it? "))
-        (org-pomodoro-kill)
-      (message "Alright, keep up the good work!"))))
+  (if (org-pomodoro-active-p)
+      (if (or (not org-pomodoro-ask-upon-killing)
+              (y-or-n-p "There is already a running timer.  Would you like to stop it? "))
+          (org-pomodoro-kill)
+        (message "Alright, keep up the good work!"))
+    (cond
+     ((eq major-mode 'org-mode)
+      (call-interactively 'org-clock-in))
+     ((eq major-mode 'org-agenda-mode)
+      (org-with-point-at (org-get-at-bol 'org-hd-marker)
+        (call-interactively 'org-clock-in)))
+     (t (let ((current-prefix-arg '(4)))
+          (call-interactively 'org-clock-in))))
+    (org-pomodoro-start :pomodoro)))
 
 (provide 'org-pomodoro)
 
