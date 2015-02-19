@@ -316,16 +316,15 @@ or :break when starting a break.")
   "A callback that is invoked by the running timer each second.
 It checks whether we reached the duration of the current phase, when 't it
 invokes the handlers for finishing."
-  (if (and (not (org-pomodoro-active-p)) org-pomodoro-timer)
-      (org-pomodoro-reset)
-    (progn
-      (setq org-pomodoro-countdown (- org-pomodoro-countdown 1))
-      (when (< org-pomodoro-countdown 1)
-        (cl-case org-pomodoro-state
-          (:pomodoro (org-pomodoro-finished))
-          (:short-break (org-pomodoro-short-break-finished))
-          (:long-break (org-pomodoro-long-break-finished))))))
+  (when (and (not (org-pomodoro-active-p)) org-pomodoro-timer)
+    (org-pomodoro-reset))
   (when (org-pomodoro-active-p)
+    (setq org-pomodoro-countdown (- org-pomodoro-countdown 1))
+    (when (< org-pomodoro-countdown 1)
+      (cl-case org-pomodoro-state
+        (:pomodoro (org-pomodoro-finished))
+        (:short-break (org-pomodoro-short-break-finished))
+        (:long-break (org-pomodoro-long-break-finished))))
     (run-hooks 'org-pomodoro-tick-hook)
     (org-pomodoro-update-mode-line)
     (when org-pomodoro-play-ticking-sounds
