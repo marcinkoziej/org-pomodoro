@@ -62,6 +62,13 @@
   :group 'org-pomodoro
   :type 'boolean)
 
+(defcustom org-pomodoro-play-start-sound nil
+  "Determines whether the pomodoro start sound is played or not.
+
+org-pomodoro-start-sound determines what sound that would be."
+  :group 'org-pomodoro
+  :type 'boolean)
+
 (defcustom org-pomodoro-play-ticking-sounds nil
   "Determines whether ticking clock sounds are played or not."
   :group 'org-pomodoro
@@ -105,6 +112,19 @@ Please note, that you have to escape the argument values yourself."
 
 (defcustom org-pomodoro-sound-args nil
   "The volume for the pomodoro sound.
+
+Please note, that you have to escape the argument values yourself."
+  :group 'org-pomodoro
+  :type 'string)
+
+(defcustom org-pomodoro-start-sound (when load-file-name
+				      (concat (file-name-directory load-file-name) "resources/bell.wav"))
+  "The path to a sound file that´s to be played when a pomodoro is started."
+  :group 'org-pomodoro
+  :type 'file)
+
+(defcustom org-pomodoro-start-sound-args nil
+  "The volume for the pomodoro start sound.
 
 Please note, that you have to escape the argument values yourself."
   :group 'org-pomodoro
@@ -266,6 +286,7 @@ or :break when starting a break.")
 (defun org-pomodoro-play-sound (type)
   "Play an audio file specified by TYPE (:pomodoro, :short-break, :long-break)."
   (let ((sound (cl-case type
+                 (:start org-pomodoro-start-sound)
                  (:pomodoro org-pomodoro-sound)
                  (:killed org-pomodoro-killed-sound)
                  (:short-break org-pomodoro-short-break-sound)
@@ -273,6 +294,7 @@ or :break when starting a break.")
                  (:tick org-pomodoro-ticking-sound)
                  (t (error "Unknown org-pomodoro sound: %S" type))))
         (args (cl-case type
+                  (:start org-pomodoro-start-sound-args)
                   (:pomodoro org-pomodoro-sound-args)
                   (:killed org-pomodoro-killed-sound-args)
                   (:short-break org-pomodoro-short-break-sound-args)
@@ -349,6 +371,8 @@ The argument STATE is optional.  The default state is `:pomodoro`."
                                  (:long-break (* 60 org-pomodoro-long-break-length)))
         org-pomodoro-timer (run-with-timer t 1 'org-pomodoro-tick))
   (when (eq org-pomodoro-state :pomodoro)
+    (when org-pomodoro-play-start-sound
+      (org-pomodoro-play-sound :start))
     (run-hooks 'org-pomodoro-started-hook))
   (org-pomodoro-update-mode-line))
 
