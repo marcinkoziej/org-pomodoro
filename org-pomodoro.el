@@ -118,7 +118,7 @@ Please note, that you have to escape the argument values yourself."
   :type 'string)
 
 (defcustom org-pomodoro-start-sound (when load-file-name
-				      (concat (file-name-directory load-file-name) "resources/bell.wav"))
+                                      (concat (file-name-directory load-file-name) "resources/bell.wav"))
   "The path to a sound file that´s to be played when a pomodoro is started."
   :group 'org-pomodoro
   :type 'file)
