@@ -446,12 +446,12 @@ This may send a notification and play a sound."
                  (org-time-string-to-time (match-string 1)))))))))
 
 ;;;###autoload
-(defun org-pomodoro ()
+(defun org-pomodoro (arg)
   "Start a new pomodoro or stop the current one.
 When no timer is running for `org-pomodoro` a new pomodoro is started and
 the current task is clocked in.  Otherwise EMACS will ask whether we´d like to
 kill the current timer, this may be a break or a running pomodoro."
-  (interactive)
+  (interactive "P")
 
   (when (and org-pomodoro-last-clock-in
              org-pomodoro-expiry-time
@@ -466,6 +466,9 @@ kill the current timer, this may be a break or a running pomodoro."
           (org-pomodoro-kill)
         (message "Alright, keep up the good work!"))
     (cond
+     (arg
+      (let ((current-prefix-arg '(4)))
+        (call-interactively 'org-clock-in)))
      ((eq major-mode 'org-mode)
       (call-interactively 'org-clock-in))
      ((eq major-mode 'org-agenda-mode)
