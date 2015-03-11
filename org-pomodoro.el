@@ -314,7 +314,8 @@ or :break when starting a break.")
   (format-seconds org-pomodoro-time-format org-pomodoro-countdown))
 
 (defun org-pomodoro-update-mode-line ()
-  "Set the modeline accordingly to the current state."
+  "Set the modeline accordingly to the current state.  Update the
+org-agenda-buffer if it exists."
   (let ((s (cl-case org-pomodoro-state
              (:pomodoro
               (propertize org-pomodoro-format 'face 'org-pomodoro-mode-line))
@@ -352,6 +353,13 @@ invokes the handlers for finishing."
     (when org-pomodoro-play-ticking-sounds
       (org-pomodoro-play-sound :tick))))
 
+(defun org-pomodoro-maybe-update-agenda ()
+  "Update the agenda buffer if it exists."
+  (let ((buf (get-buffer org-agenda-buffer-name)))
+    (when (bufferp buf)
+      (with-current-buffer buf
+        (org-agenda-redo t)))))
+
 (defun org-pomodoro-start (&optional state)
   "Start the `org-pomodoro` timer.
 The argument STATE is optional.  The default state is `:pomodoro`."
@@ -374,7 +382,8 @@ The argument STATE is optional.  The default state is `:pomodoro`."
     (when org-pomodoro-play-start-sound
       (org-pomodoro-play-sound :start))
     (run-hooks 'org-pomodoro-started-hook))
-  (org-pomodoro-update-mode-line))
+  (org-pomodoro-update-mode-line)
+  (org-pomodoro-maybe-update-agenda))
 
 (defun org-pomodoro-reset ()
   "Reset the org-pomodoro state."
@@ -382,7 +391,8 @@ The argument STATE is optional.  The default state is `:pomodoro`."
     (cancel-timer org-pomodoro-timer))
   (setq org-pomodoro-state :none
         org-pomodoro-countdown 0)
-  (org-pomodoro-update-mode-line))
+  (org-pomodoro-update-mode-line)
+  (org-pomodoro-maybe-update-agenda))
 
 (defun org-pomodoro-notify (title message)
   "Send a notification with TITLE and MESSAGE using `alert'."
@@ -401,7 +411,8 @@ This may send a notification, play a sound and start a pomodoro break."
     (org-pomodoro-start :short-break))
   (org-pomodoro-notify "Pomodoro completed!" "Time for a break.")
   (run-hooks 'org-pomodoro-finished-hook)
-  (org-pomodoro-update-mode-line))
+  (org-pomodoro-update-mode-line)
+  (org-pomodoro-maybe-update-agenda))
 
 (defun org-pomodoro-killed ()
   "Is invoked when a pomodoro was killed.
@@ -413,7 +424,8 @@ This may send a notification, play a sound and adds log."
       (org-clock-cancel)))
   (org-pomodoro-reset)
   (run-hooks 'org-pomodoro-killed-hook)
-  (org-pomodoro-update-mode-line))
+  (org-pomodoro-update-mode-line)
+  (org-pomodoro-maybe-update-agenda))
 
 (defun org-pomodoro-short-break-finished ()
   "Is invoked when a break is finished.
