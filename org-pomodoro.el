@@ -510,6 +510,9 @@ This may send a notification and play a sound."
   "Extends last clock to `current-time'."
   (interactive)
   (save-window-excursion
+    (org-clock-goto)
+    (when (re-search-forward ":LOGBOOK:" (save-excursion (outline-next-heading)) t)
+      (org-flag-drawer nil))
     (let ((last-clock (car org-clock-history)))
       (switch-to-buffer (marker-buffer last-clock))
       (goto-char last-clock)
