@@ -203,6 +203,11 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
   :group 'org-pomodoro
   :type 'string)
 
+(defcustom org-pomodoro-ticking-sound-states '(:pomodoro :short-break :long-break)
+  "The states in which to play ticking sounds."
+  :group 'org-pomodoro
+  :type 'list)
+
 ;;; BREAK VALUES
 (defcustom org-pomodoro-short-break-length 5
   "The length of a break in minutes."
@@ -356,7 +361,7 @@ or :break when starting a break.")
        (mapconcat 'identity
                   `(,org-pomodoro-audio-player
                     ,@(delq nil (list args (shell-quote-argument sound))))
-                  " "))))))
+                  " ")))))
 
 (defun org-pomodoro-maybe-play-sound (type)
   "Play an audio file specified by TYPE."
@@ -409,7 +414,8 @@ invokes the handlers for finishing."
         (:long-break (org-pomodoro-long-break-finished))))
     (run-hooks 'org-pomodoro-tick-hook)
     (org-pomodoro-update-mode-line)
-    (org-pomodoro-maybe-play-sound :tick)))
+    (when (member org-pomodoro-state org-pomodoro-ticking-sound-states)
+      (org-pomodoro-maybe-play-sound :tick))))
 
 (defun org-pomodoro-set (state)
   "Set the org-pomodoro STATE."
