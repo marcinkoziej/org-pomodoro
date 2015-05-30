@@ -2,7 +2,7 @@
 
 ;; Author: Arthur Leonard Andersen <leoc.git@gmail.com>, Marcin Koziej <marcin at lolownia dot org>
 ;; Created: May 10, 2013
-;; Version: 1.7.1
+;; Version: 2.0.0
 ;; Package-Requires: ((alert "0.5.10") (cl-lib "0.5"))
 
 ;; This file is free software; you can redistribute it and/or modify
