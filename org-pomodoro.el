@@ -32,13 +32,15 @@
 ;;   http://www.pomodorotechnique.com
 
 ;;; Code:
+(eval-when-compile
+  (require 'cl-lib))
 
 (require 'timer)
 (require 'org)
+(require 'org-agenda)
 (require 'org-clock)
 (require 'org-timer)
 (require 'alert)
-(require 'cl-lib)
 
 ;;; Custom Variables
 
