@@ -534,9 +534,11 @@ kill the current timer, this may be a break or a running pomodoro."
           (org-pomodoro-kill)
         (message "Alright, keep up the good work!"))
     (cond
-     (arg
+     ((equal arg '(4))
       (let ((current-prefix-arg '(4)))
         (call-interactively 'org-clock-in)))
+     ((equal arg '(16))
+      (call-interactively 'org-clock-in-last))
      ((eq major-mode 'org-mode)
       (call-interactively 'org-clock-in))
      ((eq major-mode 'org-agenda-mode)
