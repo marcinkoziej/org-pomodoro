@@ -322,7 +322,7 @@ or :break when starting a break.")
   "Return whether to play sound of given TYPE."
   (cl-case type
     (:start org-pomodoro-start-sound-p)
-    (:pomodoro org-pomodoro-finish-sound-p)
+    (:pomodoro org-pomodoro-finished-sound-p)
     (:killed org-pomodoro-killed-sound-p)
     (:short-break org-pomodoro-short-break-sound-p)
     (:long-break org-pomodoro-long-break-sound-p)
@@ -333,7 +333,7 @@ or :break when starting a break.")
   "Return the sound file for given TYPE."
   (cl-case type
     (:start org-pomodoro-start-sound)
-    (:pomodoro org-pomodoro-sound)
+    (:pomodoro org-pomodoro-finished-sound)
     (:killed org-pomodoro-killed-sound)
     (:short-break org-pomodoro-short-break-sound)
     (:long-break org-pomodoro-long-break-sound)
@@ -344,7 +344,7 @@ or :break when starting a break.")
   "Return the playback arguments for given TYPE."
   (cl-case type
     (:start org-pomodoro-start-sound-args)
-    (:pomodoro org-pomodoro-sound-args)
+    (:pomodoro org-pomodoro-sound-finished-args)
     (:killed org-pomodoro-killed-sound-args)
     (:short-break org-pomodoro-short-break-sound-args)
     (:long-break org-pomodoro-long-break-sound-args)
