@@ -344,7 +344,7 @@ or :break when starting a break.")
   "Return the playback arguments for given TYPE."
   (cl-case type
     (:start org-pomodoro-start-sound-args)
-    (:pomodoro org-pomodoro-sound-finished-args)
+    (:pomodoro org-pomodoro-finished-sound-args)
     (:killed org-pomodoro-killed-sound-args)
     (:short-break org-pomodoro-short-break-sound-args)
     (:long-break org-pomodoro-long-break-sound-args)
