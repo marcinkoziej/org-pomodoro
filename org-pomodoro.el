@@ -473,38 +473,36 @@ This may send a notification, play a sound and start a pomodoro break."
       (org-pomodoro-start :long-break)
     (org-pomodoro-start :short-break))
   (org-pomodoro-notify "Pomodoro completed!" "Time for a break.")
-  (run-hooks 'org-pomodoro-finished-hook)
   (org-pomodoro-update-mode-line)
-  (org-pomodoro-maybe-update-agenda))
+  (org-pomodoro-maybe-update-agenda)
+  (run-hooks 'org-pomodoro-finished-hook))
 
 (defun org-pomodoro-killed ()
   "Is invoked when a pomodoro was killed.
 This may send a notification, play a sound and adds log."
+  (org-pomodoro-reset)
   (org-pomodoro-notify "Pomodoro killed." "One does not simply kill a pomodoro!")
   (when (org-clocking-p)
     (if org-pomodoro-keep-killed-pomodoro-time
         (org-clock-out nil t)
       (org-clock-cancel)))
-  (org-pomodoro-reset)
-  (run-hooks 'org-pomodoro-killed-hook)
-  (org-pomodoro-update-mode-line)
-  (org-pomodoro-maybe-update-agenda))
+  (run-hooks 'org-pomodoro-killed-hook))
 
 (defun org-pomodoro-short-break-finished ()
   "Is invoked when a break is finished.
 This may send a notification and play a sound."
+  (org-pomodoro-reset)
   (org-pomodoro-notify "Short break finished." "Ready for another pomodoro?")
   (org-pomodoro-maybe-play-sound :short-break)
-  (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-short-break-finished-hook)
-  (org-pomodoro-reset))
+  (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-short-break-finished-hook))
 
 (defun org-pomodoro-long-break-finished ()
   "Is invoked when a long break is finished.
 This may send a notification and play a sound."
+  (org-pomodoro-reset)
   (org-pomodoro-notify "Long break finished." "Ready for another pomodoro?")
   (org-pomodoro-maybe-play-sound :long-break)
-  (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-long-break-finished-hook)
-  (org-pomodoro-reset))
+  (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-long-break-finished-hook))
 
 (defun org-pomodoro-extend-last-clock ()
   "Extends last clock to `current-time'."
