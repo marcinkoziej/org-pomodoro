@@ -77,7 +77,7 @@
   :type 'string)
 
 (defcustom org-pomodoro-format "Pomodoro~%s"
-  "The format of the mode line string during a long break."
+  "The format of the mode line string during a pomodoro session."
   :group 'org-pomodoro
   :type 'string)
 
@@ -212,12 +212,12 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
 
 ;;; BREAK VALUES
 (defcustom org-pomodoro-short-break-length 5
-  "The length of a break in minutes."
+  "The length of a short break in minutes."
   :group 'org-pomodoro
   :type 'integer)
 
 (defcustom org-pomodoro-short-break-format "Short Break~%s"
-  "The format of the mode line string during a long break."
+  "The format of the mode line string during a short break."
   :group 'org-pomodoro
   :type 'string)
 
@@ -489,7 +489,7 @@ This may send a notification, play a sound and adds log."
   (run-hooks 'org-pomodoro-killed-hook))
 
 (defun org-pomodoro-short-break-finished ()
-  "Is invoked when a break is finished.
+  "Is invoked when a short break is finished.
 This may send a notification and play a sound."
   (org-pomodoro-reset)
   (org-pomodoro-notify "Short break finished." "Ready for another pomodoro?")
