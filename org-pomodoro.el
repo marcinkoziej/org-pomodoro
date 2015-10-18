@@ -1,6 +1,7 @@
 ;;; org-pomodoro.el --- Pomodoro implementation for org-mode.
 
 ;; Author: Arthur Leonard Andersen <leoc.git@gmail.com>, Marcin Koziej <marcin at lolownia dot org>
+;; URL: https://github.com/lolownia/org-pomodoro
 ;; Created: May 10, 2013
 ;; Version: 2.0.3
 ;; Package-Requires: ((alert "0.5.10") (cl-lib "0.5"))
