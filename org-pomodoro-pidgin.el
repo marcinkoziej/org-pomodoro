@@ -59,7 +59,7 @@ ends."
   "Convert the symbol TYPE to the correspond int32.
 
 https://developer.pidgin.im/wiki/DbusHowto#CallingPidginmethods."
-  (case type
+  (cl-case type
     (offline 1)
     (available 2)
     (unavailable 3)
