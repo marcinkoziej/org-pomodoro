@@ -65,6 +65,11 @@
   :group 'org-pomodoro
   :type 'boolean)
 
+(defcustom org-pomodoro-show-number nil
+  "Whether the number of pomodoros should be shown in the modeline."
+  :group 'org-pomodoro
+  :type 'boolean)
+
 ;; Pomodoro Values
 
 (defcustom org-pomodoro-length 25
@@ -378,17 +383,21 @@ or :break when starting a break.")
 (defun org-pomodoro-update-mode-line ()
   "Set the modeline accordingly to the current state."
   (let ((s (cl-case org-pomodoro-state
-             (:pomodoro
-              (propertize org-pomodoro-format 'face 'org-pomodoro-mode-line))
-             (:short-break
-              (propertize org-pomodoro-short-break-format
-                          'face 'org-pomodoro-mode-line-break))
-             (:long-break
-              (propertize org-pomodoro-long-break-format
-                          'face 'org-pomodoro-mode-line-break)))))
+	     (:pomodoro
+	      (propertize org-pomodoro-format 'face 'org-pomodoro-mode-line))
+	     (:short-break
+	      (propertize org-pomodoro-short-break-format
+			  'face 'org-pomodoro-mode-line-break))
+	     (:long-break
+	      (propertize org-pomodoro-long-break-format
+			  'face 'org-pomodoro-mode-line-break))))
+	(count (if org-pomodoro-show-number
+		   (format "%s " org-pomodoro-count)
+		 (format ""))))
     (setq org-pomodoro-mode-line
           (when (org-pomodoro-active-p)
-            (list "[" (format s (org-pomodoro-format-seconds)) "] "))))
+            (list count
+		  (format s (org-pomodoro-format-seconds))))))
   (force-mode-line-update t))
 
 (defun org-pomodoro-maybe-update-agenda ()
