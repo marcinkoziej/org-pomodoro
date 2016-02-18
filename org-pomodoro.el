@@ -397,7 +397,7 @@ or :break when starting a break.")
     (setq org-pomodoro-mode-line
           (when (org-pomodoro-active-p)
             (list count
-		  (format s (org-pomodoro-format-seconds))))))
+		  (format s (org-pomodoro-format-seconds)) " "))))
   (force-mode-line-update t))
 
 (defun org-pomodoro-maybe-update-agenda ()
