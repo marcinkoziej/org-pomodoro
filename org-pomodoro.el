@@ -383,17 +383,19 @@ or :break when starting a break.")
 (defun org-pomodoro-update-mode-line ()
   "Set the modeline accordingly to the current state."
   (let ((s (cl-case org-pomodoro-state
-	     (:pomodoro
-	      (propertize org-pomodoro-format 'face 'org-pomodoro-mode-line))
-	     (:short-break
-	      (propertize org-pomodoro-short-break-format
-			  'face 'org-pomodoro-mode-line-break))
-	     (:long-break
-	      (propertize org-pomodoro-long-break-format
-			  'face 'org-pomodoro-mode-line-break))))
-	(count (if org-pomodoro-show-number
-		   (format "%s " org-pomodoro-count)
-		 (format ""))))
+	      (:pomodoro
+	       (propertize org-pomodoro-format 'face 'org-pomodoro-mode-line))
+	      (:short-break
+	       (propertize org-pomodoro-short-break-format
+			   'face 'org-pomodoro-mode-line-break))
+	      (:long-break
+	       (propertize org-pomodoro-long-break-format
+			   'face 'org-pomodoro-mode-line-break))))
+	 (count (if org-pomodoro-show-number
+		    (if (>= org-pomodoro-count org-pomodoro-long-break-frequency)
+			(progn (setq org-pomodoro-count 0) (format "%s " org-pomodoro-count))
+		      (format "%s " org-pomodoro-count))
+		  (format ""))))
     (setq org-pomodoro-mode-line
           (when (org-pomodoro-active-p)
             (list count
@@ -539,32 +541,31 @@ When no timer is running for `org-pomodoro` a new pomodoro is started and
 the current task is clocked in.  Otherwise EMACS will ask whether we´d like to
 kill the current timer, this may be a break or a running pomodoro."
   (interactive "P")
-
   (when (and org-pomodoro-last-clock-in
-             org-pomodoro-expiry-time
-             (org-pomodoro-expires-p)
-             (y-or-n-p "Reset pomodoro count? "))
+	     org-pomodoro-expiry-time
+	     (org-pomodoro-expires-p)
+	     (y-or-n-p "Reset pomodoro count? "))
     (setq org-pomodoro-count 0))
   (setq org-pomodoro-last-clock-in (current-time))
 
   (if (org-pomodoro-active-p)
       (if (or (not org-pomodoro-ask-upon-killing)
-              (y-or-n-p "There is already a running timer.  Would you like to stop it? "))
-          (org-pomodoro-kill)
-        (message "Alright, keep up the good work!"))
+	      (y-or-n-p "There is already a running timer.  Would you like to stop it? "))
+	  (org-pomodoro-kill)
+	(message "Alright, keep up the good work!"))
     (cond
      ((equal arg '(4))
       (let ((current-prefix-arg '(4)))
-        (call-interactively 'org-clock-in)))
+	(call-interactively 'org-clock-in)))
      ((equal arg '(16))
       (call-interactively 'org-clock-in-last))
      ((eq major-mode 'org-mode)
       (call-interactively 'org-clock-in))
      ((eq major-mode 'org-agenda-mode)
       (org-with-point-at (org-get-at-bol 'org-hd-marker)
-        (call-interactively 'org-clock-in)))
+	(call-interactively 'org-clock-in)))
      (t (let ((current-prefix-arg '(4)))
-          (call-interactively 'org-clock-in))))
+	  (call-interactively 'org-clock-in))))
     (org-pomodoro-start :pomodoro)))
 
 (provide 'org-pomodoro)
