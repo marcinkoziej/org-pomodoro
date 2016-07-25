@@ -391,13 +391,6 @@ or :break when starting a break.")
             (list "[" (format s (org-pomodoro-format-seconds)) "] "))))
   (force-mode-line-update t))
 
-(defun org-pomodoro-maybe-update-agenda ()
-  "Update the agenda buffer if it exists."
-  (let ((buf (get-buffer org-agenda-buffer-name)))
-    (when (bufferp buf)
-      (with-current-buffer buf
-        (org-agenda-redo t)))))
-
 (defun org-pomodoro-kill ()
   "Kill the current timer, reset the phase and update the modeline."
   (org-pomodoro-killed))
@@ -447,7 +440,7 @@ The argument STATE is optional.  The default state is `:pomodoro`."
     (org-pomodoro-maybe-play-sound :start)
     (run-hooks 'org-pomodoro-started-hook))
   (org-pomodoro-update-mode-line)
-  (org-pomodoro-maybe-update-agenda))
+  (org-agenda-maybe-redo))
 
 (defun org-pomodoro-reset ()
   "Reset the org-pomodoro state."
@@ -456,7 +449,7 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   (setq org-pomodoro-state :none
         org-pomodoro-countdown 0)
   (org-pomodoro-update-mode-line)
-  (org-pomodoro-maybe-update-agenda))
+  (org-agenda-maybe-redo))
 
 (defun org-pomodoro-notify (title message)
   "Send a notification with TITLE and MESSAGE using `alert'."
@@ -475,7 +468,7 @@ This may send a notification, play a sound and start a pomodoro break."
     (org-pomodoro-start :short-break))
   (org-pomodoro-notify "Pomodoro completed!" "Time for a break.")
   (org-pomodoro-update-mode-line)
-  (org-pomodoro-maybe-update-agenda)
+  (org-agenda-maybe-redo)
   (run-hooks 'org-pomodoro-finished-hook))
 
 (defun org-pomodoro-killed ()
