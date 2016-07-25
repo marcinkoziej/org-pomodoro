@@ -356,15 +356,19 @@ or :break when starting a break.")
   "Play an audio file specified by TYPE (:pomodoro, :short-break, :long-break)."
   (let ((sound (org-pomodoro-sound type))
         (args (org-pomodoro-sound-args type)))
-    (when (and org-pomodoro-audio-player
-               org-pomodoro-play-sounds
-               sound)
-      (start-process-shell-command
-       "org-pomodoro-audio-player" nil
-       (mapconcat 'identity
-                  `(,org-pomodoro-audio-player
-                    ,@(delq nil (list args (shell-quote-argument (expand-file-name sound)))))
-                  " ")))))
+    (cond ((and (fboundp 'sound-wav-play)
+		org-pomodoro-play-sounds
+		sound)
+	   (sound-wav-play sound))
+	  ((and org-pomodoro-audio-player
+		org-pomodoro-play-sounds
+		sound)
+	   (start-process-shell-command
+	    "org-pomodoro-audio-player" nil
+	    (mapconcat 'identity
+		       `(,org-pomodoro-audio-player
+			 ,@(delq nil (list args (shell-quote-argument (expand-file-name sound)))))
+		       " "))))))
 
 (defun org-pomodoro-maybe-play-sound (type)
   "Play an audio file specified by TYPE."
