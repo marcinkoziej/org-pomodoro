@@ -156,6 +156,11 @@ Use `org-pomodoro-short-break-sound' to determine what sound that should be."
   :group 'org-pomodoro
   :type 'boolean)
 
+(defcustom org-pomodoro-clock-break nil
+  "When t, also clocks time during breaks."
+  :group 'org-pomodoro
+  :type 'boolean)
+
 (defcustom org-pomodoro-short-break-sound (when load-file-name
                                             (concat (file-name-directory load-file-name)
                                                     "resources/bell.wav"))
@@ -464,7 +469,8 @@ The argument STATE is optional.  The default state is `:pomodoro`."
 (defun org-pomodoro-finished ()
   "Is invoked when a pomodoro was finished successfully.
 This may send a notification, play a sound and start a pomodoro break."
-  (org-clock-out nil t)
+  (unless org-pomodoro-clock-break
+      (org-clock-out nil t))
   (org-pomodoro-maybe-play-sound :pomodoro)
   (setq org-pomodoro-count (+ org-pomodoro-count 1))
   (if (zerop (mod org-pomodoro-count org-pomodoro-long-break-frequency))
@@ -489,6 +495,8 @@ This may send a notification, play a sound and adds log."
 (defun org-pomodoro-short-break-finished ()
   "Is invoked when a short break is finished.
 This may send a notification and play a sound."
+  (when org-pomodoro-clock-break
+    (org-clock-out nil t))
   (org-pomodoro-reset)
   (org-pomodoro-notify "Short break finished." "Ready for another pomodoro?")
   (org-pomodoro-maybe-play-sound :short-break)
@@ -497,6 +505,8 @@ This may send a notification and play a sound."
 (defun org-pomodoro-long-break-finished ()
   "Is invoked when a long break is finished.
 This may send a notification and play a sound."
+  (when org-pomodoro-clock-break
+    (org-clock-out nil t))
   (org-pomodoro-reset)
   (org-pomodoro-notify "Long break finished." "Ready for another pomodoro?")
   (org-pomodoro-maybe-play-sound :long-break)
