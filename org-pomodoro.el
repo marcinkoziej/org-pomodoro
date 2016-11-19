@@ -216,6 +216,11 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
   :group 'org-pomodoro
   :type 'list)
 
+(defcustom org-pomodoro-ticking-frequency 1
+  "The frequency at which to playback the ticking sound."
+  :group 'org-pomodoro
+  :type 'list)
+
 ;;; BREAK VALUES
 (defcustom org-pomodoro-short-break-length 5
   "The length of a short break in minutes."
@@ -419,7 +424,8 @@ invokes the handlers for finishing."
         (:long-break (org-pomodoro-long-break-finished))))
     (run-hooks 'org-pomodoro-tick-hook)
     (org-pomodoro-update-mode-line)
-    (when (member org-pomodoro-state org-pomodoro-ticking-sound-states)
+    (when (and (member org-pomodoro-state org-pomodoro-ticking-sound-states)
+	       (equal (mod org-pomodoro-countdown org-pomodoro-ticking-frequency) 0))
       (org-pomodoro-maybe-play-sound :tick))))
 
 (defun org-pomodoro-set (state)
