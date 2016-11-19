@@ -206,6 +206,11 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
   :group 'org-pomodoro
   :type 'file)
 
+(defcustom org-pomodoro-tick-period 1
+  "How often to play the tick sound in seconds."
+  :group 'org-pomodoro
+  :type 'integer)
+
 (defcustom org-pomodoro-ticking-sound-args nil
   "Arguments used when playing the `org-pomodoro-ticking-sound'."
   :group 'org-pomodoro
@@ -432,11 +437,11 @@ invokes the handlers for finishing."
   "Set the org-pomodoro STATE."
   (setq org-pomodoro-state state
         org-pomodoro-countdown
-          (cl-case state
-            (:pomodoro (* 60 org-pomodoro-length))
-            (:short-break (* 60 org-pomodoro-short-break-length))
-            (:long-break (* 60 org-pomodoro-long-break-length)))
-        org-pomodoro-timer (run-with-timer t 1 'org-pomodoro-tick)))
+        (cl-case state
+          (:pomodoro (* 60 org-pomodoro-length))
+          (:short-break (* 60 org-pomodoro-short-break-length))
+          (:long-break (* 60 org-pomodoro-long-break-length)))
+        org-pomodoro-timer (run-with-timer t org-pomodoro-tick-period 'org-pomodoro-tick)))
 
 (defun org-pomodoro-start (&optional state)
   "Start the `org-pomodoro` timer.
