@@ -407,7 +407,7 @@ org-pomodoro-time-format."
               (propertize org-pomodoro-long-break-format
                           'face 'org-pomodoro-mode-line-break)))))
     (setq org-pomodoro-mode-line
-          (when (org-pomodoro-active-p)
+          (when (and (org-pomodoro-active-p) (> (length s) 0))
             (list "[" (format s (org-pomodoro-format-seconds)) "] "))))
   (force-mode-line-update t))
 
