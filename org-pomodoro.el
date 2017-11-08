@@ -300,8 +300,8 @@ Run before a break's specific hook.")
 (defvar org-pomodoro-timer nil
   "The timer while a pomodoro or a break.")
 
-(defvar org-pomodoro-countdown 0
-  "The actual countdown value for a phase in seconds.")
+(defvar org-pomodoro-end-time nil
+  "The end time of the current pomodoro phase.")
 
 (defvar org-pomodoro-state :none
   "The current state of `org-pomodoro`.
@@ -385,9 +385,15 @@ or :break when starting a break.")
   (when (org-pomodoro-sound-p type)
     (org-pomodoro-play-sound type)))
 
+(defun org-pomodoro-remaining-seconds ()
+  "Return the number of seconds remaining in the current phase as a float.
+Negative if the current phase is over."
+ (float-time (time-subtract org-pomodoro-end-time (current-time))))
+
 (defun org-pomodoro-format-seconds ()
-  "Format the countdown with the format specified in org-pomodoro-time-format."
-  (format-seconds org-pomodoro-time-format org-pomodoro-countdown))
+  "Format the time remaining in the current phase with the format specified in
+org-pomodoro-time-format."
+  (format-seconds org-pomodoro-time-format (org-pomodoro-remaining-seconds)))
 
 (defun org-pomodoro-update-mode-line ()
   "Set the modeline accordingly to the current state."
@@ -416,8 +422,10 @@ invokes the handlers for finishing."
   (when (and (not (org-pomodoro-active-p)) org-pomodoro-timer)
     (org-pomodoro-reset))
   (when (org-pomodoro-active-p)
-    (setq org-pomodoro-countdown (- org-pomodoro-countdown 1))
-    (when (< org-pomodoro-countdown 1)
+    ;; The first element of a time value is the high-order part of the seconds
+    ;; value. This is less than 0 if org-pomodoro-end-time is in the past of
+    ;; the current-time.
+    (when (< (org-pomodoro-remaining-seconds) 0)
       (cl-case org-pomodoro-state
         (:pomodoro (org-pomodoro-finished))
         (:short-break (org-pomodoro-short-break-finished))
@@ -425,17 +433,19 @@ invokes the handlers for finishing."
     (run-hooks 'org-pomodoro-tick-hook)
     (org-pomodoro-update-mode-line)
     (when (and (member org-pomodoro-state org-pomodoro-ticking-sound-states)
-	       (equal (mod org-pomodoro-countdown org-pomodoro-ticking-frequency) 0))
+               (equal (mod (truncate (org-pomodoro-remaining-seconds))
+                           org-pomodoro-ticking-frequency)
+                      0))
       (org-pomodoro-maybe-play-sound :tick))))
 
 (defun org-pomodoro-set (state)
   "Set the org-pomodoro STATE."
   (setq org-pomodoro-state state
-        org-pomodoro-countdown
-          (cl-case state
-            (:pomodoro (* 60 org-pomodoro-length))
-            (:short-break (* 60 org-pomodoro-short-break-length))
-            (:long-break (* 60 org-pomodoro-long-break-length)))
+        org-pomodoro-end-time
+         (cl-case state
+           (:pomodoro (time-add (current-time) (* 60 org-pomodoro-length)))
+           (:short-break (time-add (current-time) (* 60 org-pomodoro-short-break-length)))
+           (:long-break (time-add (current-time) (* 60 org-pomodoro-long-break-length))))
         org-pomodoro-timer (run-with-timer t 1 'org-pomodoro-tick)))
 
 (defun org-pomodoro-start (&optional state)
@@ -462,7 +472,7 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   (when org-pomodoro-timer
     (cancel-timer org-pomodoro-timer))
   (setq org-pomodoro-state :none
-        org-pomodoro-countdown 0)
+        org-pomodoro-end-time nil)
   (org-pomodoro-update-mode-line)
   (org-agenda-maybe-redo))
 
