@@ -324,10 +324,8 @@ or :break when starting a break.")
 
 (defun org-pomodoro-expires-p ()
   "Return true when the last clock-in was more than `org-pomodoro-expiry-time`."
-  (let* ((current-time-secs (nth 1 (current-time)))
-         (last-clock-in-secs (nth 1 org-pomodoro-last-clock-in))
-         (delta-minutes (/ (- current-time-secs last-clock-in-secs) 60)))
-    (< org-pomodoro-expiry-time delta-minutes)))
+  (let ((delta-minutes (/ (float-time (time-subtract (current-time) org-pomodoro-last-clock-in)) 60)))
+    (> delta-minutes org-pomodoro-expiry-time)))
 
 (defun org-pomodoro-sound-p (type)
   "Return whether to play sound of given TYPE."
