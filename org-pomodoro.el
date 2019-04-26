@@ -570,7 +570,7 @@ kill the current timer, this may be a break or a running pomodoro."
         (call-interactively 'org-clock-in)))
      ((equal arg '(16))
       (call-interactively 'org-clock-in-last))
-     ((eq major-mode 'org-mode)
+     ((memq major-mode (list 'org-mode 'org-journal-mode))
       (call-interactively 'org-clock-in))
      ((eq major-mode 'org-agenda-mode)
       (org-with-point-at (org-get-at-bol 'org-hd-marker)
