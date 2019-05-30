@@ -65,6 +65,15 @@
   :group 'org-pomodoro
   :type 'boolean)
 
+(defcustom org-pomodoro-manual-break nil
+  "Whether the user needs to exit manually from a running pomodoro to enter a break.
+
+If non-nil, after the time is up for a pomodoro, an \"overtime\"
+state is entered until ‘org-pomodoro’ is invoked, which then
+finishes the pomodoro and enters the break period."
+  :group 'org-pomodoro
+  :type 'boolean)
+
 ;; Pomodoro Values
 
 (defcustom org-pomodoro-length 25
@@ -127,6 +136,26 @@ Use `org-pomodoro-finished-sound' to determine what sound that should be."
 
 (defcustom org-pomodoro-finished-sound-args nil
   "Arguments used when playing the `org-pomodoro-finished-sound'."
+  :group 'org-pomodoro
+  :type 'string)
+
+;;; POMODORO OVERTIME SOUND
+(defcustom org-pomodoro-overtime-sound-p t
+  "Determines whether to play a sound when a pomodoro starts to run overtime.
+
+Use `org-pomodoro-overtime-sound' to determine what sound that should be."
+  :group 'org-pomodoro
+  :type 'boolean)
+
+(defcustom org-pomodoro-overtime-sound (when load-file-name
+                                         (concat (file-name-directory load-file-name)
+                                                 "resources/bell.wav"))
+  "The path to a sound file that´s to be played when a pomodoro runs overtime."
+  :group 'org-pomodoro
+  :type 'file)
+
+(defcustom org-pomodoro-overtime-sound-args nil
+  "Arguments used when playing the `org-pomodoro-overtime-sound'."
   :group 'org-pomodoro
   :type 'string)
 
@@ -221,6 +250,12 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
   :group 'org-pomodoro
   :type 'list)
 
+;;; OVERTIME VALUES
+(defcustom org-pomodoro-overtime-format "+%s"
+  "The format of the mode line during a pomodoro running overtime."
+  :group 'org-pomodoro
+  :type 'string)
+
 ;;; BREAK VALUES
 (defcustom org-pomodoro-short-break-length 5
   "The length of a short break in minutes."
@@ -264,6 +299,9 @@ whether to reset the pomodoro count next time you call `org-pomodoro'."
 (defvar org-pomodoro-finished-hook nil
   "Hooks run when a pomodoro is finished.")
 
+(defvar org-pomodoro-overtime-hook nil
+  "Hooks run when a pomodoro enters overtime.")
+
 (defvar org-pomodoro-killed-hook nil
   "Hooks run when a pomodoro is killed.")
 
@@ -285,6 +323,11 @@ Run before a break's specific hook.")
 (defface org-pomodoro-mode-line
   '((t (:foreground "tomato1")))
   "Face of a pomodoro in the modeline."
+  :group 'faces)
+
+(defface org-pomodoro-mode-line-overtime
+  '((t (:foreground "tomato3" :weight bold)))
+  "Face of a pomodoro running overtime in the modeline."
   :group 'faces)
 
 (defface org-pomodoro-mode-line-break
@@ -332,6 +375,7 @@ or :break when starting a break.")
   (cl-case type
     (:start org-pomodoro-start-sound-p)
     (:pomodoro org-pomodoro-finished-sound-p)
+    (:overtime org-pomodoro-overtime-sound-p)
     (:killed org-pomodoro-killed-sound-p)
     (:short-break org-pomodoro-short-break-sound-p)
     (:long-break org-pomodoro-long-break-sound-p)
@@ -343,6 +387,7 @@ or :break when starting a break.")
   (cl-case type
     (:start org-pomodoro-start-sound)
     (:pomodoro org-pomodoro-finished-sound)
+    (:overtime org-pomodoro-overtime-sound)
     (:killed org-pomodoro-killed-sound)
     (:short-break org-pomodoro-short-break-sound)
     (:long-break org-pomodoro-long-break-sound)
@@ -354,6 +399,7 @@ or :break when starting a break.")
   (cl-case type
     (:start org-pomodoro-start-sound-args)
     (:pomodoro org-pomodoro-finished-sound-args)
+    (:overtime org-pomodoro-overtime-sound-args)
     (:killed org-pomodoro-killed-sound-args)
     (:short-break org-pomodoro-short-break-sound-args)
     (:long-break org-pomodoro-long-break-sound-args)
@@ -391,13 +437,19 @@ Negative if the current phase is over."
 (defun org-pomodoro-format-seconds ()
   "Format the time remaining in the current phase with the format specified in
 org-pomodoro-time-format."
-  (format-seconds org-pomodoro-time-format (org-pomodoro-remaining-seconds)))
+  (format-seconds org-pomodoro-time-format
+                  (if (eq org-pomodoro-state :overtime)
+                      (- (org-pomodoro-remaining-seconds))
+                    (org-pomodoro-remaining-seconds))))
 
 (defun org-pomodoro-update-mode-line ()
   "Set the modeline accordingly to the current state."
   (let ((s (cl-case org-pomodoro-state
              (:pomodoro
               (propertize org-pomodoro-format 'face 'org-pomodoro-mode-line))
+             (:overtime
+              (propertize org-pomodoro-overtime-format
+                          'face 'org-pomodoro-mode-line-overtime))
              (:short-break
               (propertize org-pomodoro-short-break-format
                           'face 'org-pomodoro-mode-line-break))
@@ -425,7 +477,9 @@ invokes the handlers for finishing."
     ;; the current-time.
     (when (< (org-pomodoro-remaining-seconds) 0)
       (cl-case org-pomodoro-state
-        (:pomodoro (org-pomodoro-finished))
+        (:pomodoro (if org-pomodoro-manual-break
+                       (org-pomodoro-overtime)
+                     (org-pomodoro-finished)))
         (:short-break (org-pomodoro-short-break-finished))
         (:long-break (org-pomodoro-long-break-finished))))
     (run-hooks 'org-pomodoro-tick-hook)
@@ -440,10 +494,11 @@ invokes the handlers for finishing."
   "Set the org-pomodoro STATE."
   (setq org-pomodoro-state state
         org-pomodoro-end-time
-         (cl-case state
-           (:pomodoro (time-add (current-time) (* 60 org-pomodoro-length)))
-           (:short-break (time-add (current-time) (* 60 org-pomodoro-short-break-length)))
-           (:long-break (time-add (current-time) (* 60 org-pomodoro-long-break-length))))
+        (cl-case state
+          (:pomodoro (time-add (current-time) (* 60 org-pomodoro-length)))
+          (:overtime (current-time))
+          (:short-break (time-add (current-time) (* 60 org-pomodoro-short-break-length)))
+          (:long-break (time-add (current-time) (* 60 org-pomodoro-long-break-length))))
         org-pomodoro-timer (run-with-timer t 1 'org-pomodoro-tick)))
 
 (defun org-pomodoro-start (&optional state)
@@ -479,6 +534,15 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   (alert message :title title :category 'org-pomodoro))
 
 ;; Handlers for pomodoro events.
+
+(defun org-pomodoro-overtime ()
+  "Is invoked when the time for a pomodoro runs out.
+Notify the user that the pomodoro should be finished by calling ‘org-pomodoro’"
+  (org-pomodoro-maybe-play-sound :overtime)
+  (org-pomodoro-notify "Pomodoro completed. Now on overtime!" "Start break by calling ‘org-pomodoro’")
+  (org-pomodoro-start :overtime)
+  (org-pomodoro-update-mode-line)
+  (run-hooks 'org-pomodoro-overtime-hook))
 
 (defun org-pomodoro-finished ()
   "Is invoked when a pomodoro was finished successfully.
@@ -559,11 +623,18 @@ kill the current timer, this may be a break or a running pomodoro."
     (setq org-pomodoro-count 0))
   (setq org-pomodoro-last-clock-in (current-time))
 
-  (if (org-pomodoro-active-p)
-      (if (or (not org-pomodoro-ask-upon-killing)
-              (y-or-n-p "There is already a running timer.  Would you like to stop it? "))
-          (org-pomodoro-kill)
-        (message "Alright, keep up the good work!"))
+  (cond
+   ;; possibly break from overtime
+   ((and (org-pomodoro-active-p) (eq org-pomodoro-state :overtime))
+    (org-pomodoro-finished))
+   ;; Maybe kill running pomodoro
+   ((org-pomodoro-active-p)
+    (if (or (not org-pomodoro-ask-upon-killing)
+            (y-or-n-p "There is already a running timer.  Would you like to stop it? "))
+        (org-pomodoro-kill)
+      (message "Alright, keep up the good work!")))
+   ;; or start and clock in pomodoro
+   (t
     (cond
      ((equal arg '(4))
       (let ((current-prefix-arg '(4)))
@@ -577,7 +648,7 @@ kill the current timer, this may be a break or a running pomodoro."
         (call-interactively 'org-clock-in)))
      (t (let ((current-prefix-arg '(4)))
           (call-interactively 'org-clock-in))))
-    (org-pomodoro-start :pomodoro)))
+    (org-pomodoro-start :pomodoro))))
 
 (provide 'org-pomodoro)
 

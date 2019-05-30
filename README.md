@@ -8,7 +8,7 @@ This adds very basic support for
 [Pomodoro technique](http://www.pomodorotechnique.com/)
 in Emacs' org-mode.
 
-With default customs:
+With default options:
 
 You can start a pomodoro for the task at point or select one of the
 last tasks that you clocked time for. Each clocked-in pomodoro
@@ -38,6 +38,24 @@ Usage
     a pomodoro.
  4. If you call `org-pomodoro` outside org-mode, you'll be presented
     with list of recent tasks, as `C-u org-clock-in` would.
+
+Customization
+=============
+
+Most aspects of `org-pomodoro` can be customized. Examples are the
+length of pomodoros and breaks (`org-pomodoro-length`,
+`org-pomodoro-short-break-length`, `org-pomodoro-long-break-length`),
+sounds, modeline display, if breaks should be clocked
+(`org-pomodoro-clock-break`) the behaviour when a pomodoro is reset
+(`org-pomodoro-ask-upon-killing`, `org-pomodoro-keep-killed-time`)
+etc. Have a look at the `org-pomodoro` customization group.
+
+Some workflows benefit from the option to work a few minutes
+“overtime” to finish a task before taking a break (that is, a slightly
+dynamic pomodoro time). The option `org-pomodoro-manual-break` enables
+this workflow, where a break notification is sent at the end of the
+pomodoro time but the break is started first when manually calling
+`org-pomodoro`.
 
 License
 =======
