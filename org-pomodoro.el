@@ -292,6 +292,8 @@ whether to reset the pomodoro count next time you call `org-pomodoro'."
   :type 'boolean)
 
 ;; Hooks
+(defvar org-pomodoro-before-start-hook nil
+  "Hooks run before a pomodoro is started.")
 
 (defvar org-pomodoro-started-hook nil
   "Hooks run when a pomodoro is started.")
@@ -511,6 +513,8 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   (unless (memq 'org-pomodoro-mode-line global-mode-string)
     (setq global-mode-string (append global-mode-string
                                      '(org-pomodoro-mode-line))))
+
+  (run-hooks 'org-pomodoro-before-start-hook)
 
   (org-pomodoro-set (or state :pomodoro))
 
