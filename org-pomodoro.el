@@ -443,9 +443,18 @@ invokes the handlers for finishing."
   (setq org-pomodoro-state state
         org-pomodoro-end-time
          (cl-case state
-           (:pomodoro (time-add (current-time) (* 60 org-pomodoro-length)))
-           (:short-break (time-add (current-time) (* 60 org-pomodoro-short-break-length)))
-           (:long-break (time-add (current-time) (* 60 org-pomodoro-long-break-length))))
+           (:pomodoro
+            (time-add (current-time)
+                      (* 60 (string-to-int (read-string "Pomodoro duration: "
+                                                        (format "%s" org-pomodoro-length))))))
+           (:short-break
+            (time-add (current-time)
+                      (* 60 (string-to-int (read-string "Short break duration: "
+                                                        (format "%s" org-pomodoro-short-break-length))))))
+           (:long-break
+            (time-add (current-time)
+                      (* 60 (string-to-int (read-string "Long break duration: "
+                                                        (format "%s" org-pomodoro-long-break-length)))))))
         org-pomodoro-timer (run-with-timer t 1 'org-pomodoro-tick)))
 
 (defun org-pomodoro-start (&optional state)
@@ -492,8 +501,10 @@ This may send a notification, play a sound and start a pomodoro break."
   (org-pomodoro-maybe-play-sound :pomodoro)
   (setq org-pomodoro-count (+ org-pomodoro-count 1))
   (if (zerop (mod org-pomodoro-count org-pomodoro-long-break-frequency))
-      (org-pomodoro-start :long-break)
-    (org-pomodoro-start :short-break))
+      (when (yes-or-no-p "Do you want to start a long break?")
+        (org-pomodoro-start :long-break))
+    (when (yes-or-no-p "Do you want to start a short break?")
+      (org-pomodoro-start :short-break)))
   (org-pomodoro-notify "Pomodoro completed!" "Time for a break.")
   (org-pomodoro-update-mode-line)
   (org-agenda-maybe-redo)
