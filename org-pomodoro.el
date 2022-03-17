@@ -564,6 +564,7 @@ This may send a notification, play a sound and start a pomodoro break."
 This may send a notification, play a sound and adds log."
   (org-pomodoro-reset)
   (org-pomodoro-notify "Pomodoro killed." "One does not simply kill a pomodoro!")
+  (org-pomodoro-maybe-play-sound :killed)
   (when (org-clocking-p)
     (if org-pomodoro-keep-killed-pomodoro-time
         (org-clock-out nil t)
