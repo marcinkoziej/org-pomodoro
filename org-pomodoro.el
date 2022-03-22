@@ -98,6 +98,11 @@ finishes the pomodoro and enters the break period."
   :group 'org-pomodoro
   :type 'string)
 
+(defcustom org-pomodoro-default-args nil
+  "Default arguments appended to all other args."
+  :group 'org-pomodoro
+  :type 'string)
+
 ;;; POMODORO START SOUND
 (defcustom org-pomodoro-start-sound-p nil
   "Determines whether to play a sound when a pomodoro started.
@@ -421,7 +426,7 @@ or :break when starting a break.")
 	    "org-pomodoro-audio-player" nil
 	    (mapconcat 'identity
 		       `(,org-pomodoro-audio-player
-			 ,@(delq nil (list args (shell-quote-argument (expand-file-name sound)))))
+			 ,@(delq nil (list org-pomodoro-default-args args (shell-quote-argument (expand-file-name sound)))))
 		       " "))))))
 
 (defun org-pomodoro-maybe-play-sound (type)
