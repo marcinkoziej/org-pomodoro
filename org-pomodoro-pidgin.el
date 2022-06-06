@@ -122,7 +122,7 @@ TYPE must be valid for `org-pompid--status-type-to-id'."
    message
    (format-time-string
     "%H:%M"
-    (time-add (current-time) (seconds-to-time org-pomodoro-countdown)))))
+    org-pomodoro-end-time)))
 
 (add-hook
  'org-pomodoro-started-hook
