@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(require 'org-pomodoro)
+
 (ert-deftest org-pomodoro-expires-when-last-clockin-too-old ()
   "Test the return value is true when org-pomodoro-last-clock-in is too old."
   (let ((org-pomodoro-last-clock-in '(0 120 0 0))
