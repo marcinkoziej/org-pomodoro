@@ -627,7 +627,9 @@ kill the current timer, this may be a break or a running pomodoro."
   (cond
    ;; possibly break from overtime
    ((and (org-pomodoro-active-p) (eq org-pomodoro-state :overtime))
-    (org-pomodoro-finished))
+    ;; Do not play a sound after overtime
+    (let (org-pomodoro-finished-sound-p)
+      (org-pomodoro-finished)))
    ;; Maybe kill running pomodoro
    ((org-pomodoro-active-p)
     (if (or (not org-pomodoro-ask-upon-killing)
