@@ -91,9 +91,15 @@ finishes the pomodoro and enters the break period."
   :group 'org-pomodoro
   :type 'string)
 
+(defcustom org-pomodoro-audio-player-buffer "*org-pomodoro-audio-player*"
+  "Buffer which is play audio sounds."
+  :group 'org-pomodoro
+  :type 'string)
 
-(defcustom org-pomodoro-audio-player (or (executable-find "aplay")
-                                         (executable-find "afplay"))
+(defcustom org-pomodoro-audio-player (or (executable-find "mpv")
+                                         (executable-find "mplayer")
+                                         (executable-find "ffplay")
+                                         (executable-find "play"))
   "Music player used to play sounds."
   :group 'org-pomodoro
   :type 'string)
@@ -228,9 +234,16 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
   :group 'org-pomodoro
   :type 'boolean)
 
+(defcustom org-pomodoro-ticking-sound-long nil
+  "Determines whether ticking sounds are long or not."
+  :group 'org-pomodoro
+  :type 'boolean)
+
 (defcustom org-pomodoro-ticking-sound (when load-file-name
                                         (concat (file-name-directory load-file-name)
-                                                "resources/tick.wav"))
+                                                (if org-pomodoro-ticking-sound-long
+                                                    "resources/tick_long.mp3"
+                                                  "resources/tick.wav")))
   "The path to a sound file that´s to be played while a pomodoro is running."
   :group 'org-pomodoro
   :type 'file)
@@ -245,7 +258,7 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
   :group 'org-pomodoro
   :type 'list)
 
-(defcustom org-pomodoro-ticking-frequency 1
+(defcustom org-pomodoro-ticking-frequency (if org-pomodoro-ticking-sound-long 10 1)
   "The frequency at which to playback the ticking sound."
   :group 'org-pomodoro
   :type 'list)
@@ -406,26 +419,35 @@ or :break when starting a break.")
     (:tick org-pomodoro-ticking-sound-args)
     (t (error "Unknown org-pomodoro sound: %S" type))))
 
+(defun org-pomodoro-stop-sound ()
+  "Stop an playing audio file now"
+  (let ((kill-buffer-query-functions nil))
+    (when (get-buffer org-pomodoro-audio-player-buffer)
+      (kill-buffer org-pomodoro-audio-player-buffer))))
+
 (defun org-pomodoro-play-sound (type)
   "Play an audio file specified by TYPE (:pomodoro, :short-break, :long-break)."
   (let ((sound (org-pomodoro-sound type))
-        (args (org-pomodoro-sound-args type)))
+        (args (concat (org-pomodoro-sound-args type)
+                      (when (string-equal org-pomodoro-audio-player (executable-find "ffplay"))
+                        " -nodisp -autoexit"))))
     (cond ((and (fboundp 'sound-wav-play)
-		org-pomodoro-play-sounds
-		sound)
-	   (sound-wav-play sound))
-	  ((and org-pomodoro-audio-player
-		org-pomodoro-play-sounds
-		sound)
-	   (start-process-shell-command
-	    "org-pomodoro-audio-player" nil
-	    (mapconcat 'identity
-		       `(,org-pomodoro-audio-player
-			 ,@(delq nil (list args (shell-quote-argument (expand-file-name sound)))))
-		       " "))))))
+                org-pomodoro-play-sounds
+                sound)
+           (sound-wav-play sound))
+          ((and org-pomodoro-audio-player
+                org-pomodoro-play-sounds
+                sound)
+           (start-process-shell-command
+            "org-pomodoro-audio-player" org-pomodoro-audio-player-buffer
+            (mapconcat 'identity
+                       `(,org-pomodoro-audio-player
+                         ,@(delq nil (list args (shell-quote-argument (expand-file-name sound)))))
+                       " "))))))
 
 (defun org-pomodoro-maybe-play-sound (type)
   "Play an audio file specified by TYPE."
+  (org-pomodoro-stop-sound)
   (when (org-pomodoro-sound-p type)
     (org-pomodoro-play-sound type)))
 
@@ -485,7 +507,7 @@ invokes the handlers for finishing."
     (run-hooks 'org-pomodoro-tick-hook)
     (org-pomodoro-update-mode-line)
     (when (and (member org-pomodoro-state org-pomodoro-ticking-sound-states)
-               (equal (mod (truncate (org-pomodoro-remaining-seconds))
+               (equal (mod (truncate (1+ (org-pomodoro-remaining-seconds)))
                            org-pomodoro-ticking-frequency)
                       0))
       (org-pomodoro-maybe-play-sound :tick))))
