@@ -91,6 +91,11 @@ finishes the pomodoro and enters the break period."
   :group 'org-pomodoro
   :type 'string)
 
+(defcustom org-pomodoro-notify-options nil
+  "Aditional options passed to alert."
+  :group 'org-pomodoro
+  :type 'hash)
+
 
 (defcustom org-pomodoro-audio-player (or (executable-find "aplay")
                                          (executable-find "afplay"))
@@ -531,7 +536,9 @@ The argument STATE is optional.  The default state is `:pomodoro`."
 
 (defun org-pomodoro-notify (title message)
   "Send a notification with TITLE and MESSAGE using `alert'."
-  (alert message :title title :category 'org-pomodoro))
+  (let ((options (append `(:title ,title :category 'org-pomodoro)
+                         org-pomodoro-notify-options)))
+    (apply 'alert message options)))
 
 ;; Handlers for pomodoro events.
 
