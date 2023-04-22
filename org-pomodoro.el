@@ -357,6 +357,12 @@ or :break when starting a break.")
 (defvar org-pomodoro-last-clock-in nil
   "The last time the pomodoro was set.")
 
+(defvar org-pomodoro-next-tick-time nil
+  "The next time at which ‘org-pomodoro-tick’ will be run. If set and if
+  ‘org-pomodoro-tick’ runs before this time, the contents of
+  ‘org-pomodoro-tick’ (including the hooks in ‘org-pomodoro-tick-hook’) will
+  not be run.")
+
 ;;; Internal
 
 ;; Helper Functions
@@ -471,7 +477,16 @@ It checks whether we reached the duration of the current phase, when 't it
 invokes the handlers for finishing."
   (when (and (not (org-pomodoro-active-p)) org-pomodoro-timer)
     (org-pomodoro-reset))
-  (when (org-pomodoro-active-p)
+  (when (and (org-pomodoro-active-p)
+             ;; Skip running this tick if the next tick time is in the
+             ;; future. This prevents running multiple ticks in very close
+             ;; succession if Emacs delays running a tick, which causes
+             ;; multiple tick sounds to be played in close succession.
+             (or (null org-pomodoro-next-tick-time)
+                 (> (float-time) org-pomodoro-next-tick-time)))
+    ;; Schedule the next tick for the beginning of the next second in Unix time.
+    (setq org-pomodoro-next-tick-time
+          (car (cl-floor (+ (float-time) 1))))
     ;; The first element of a time value is the high-order part of the seconds
     ;; value. This is less than 0 if org-pomodoro-end-time is in the past of
     ;; the current-time.
@@ -482,13 +497,15 @@ invokes the handlers for finishing."
                      (org-pomodoro-finished)))
         (:short-break (org-pomodoro-short-break-finished))
         (:long-break (org-pomodoro-long-break-finished))))
-    (run-hooks 'org-pomodoro-tick-hook)
+    ;; Update mode line and play tick sounds before running hooks to make these things
+    ;; happen as regularly as possible.
     (org-pomodoro-update-mode-line)
     (when (and (member org-pomodoro-state org-pomodoro-ticking-sound-states)
                (equal (mod (truncate (org-pomodoro-remaining-seconds))
                            org-pomodoro-ticking-frequency)
                       0))
-      (org-pomodoro-maybe-play-sound :tick))))
+      (org-pomodoro-maybe-play-sound :tick))
+    (run-hooks 'org-pomodoro-tick-hook)))
 
 (defun org-pomodoro-set (state)
   "Set the org-pomodoro STATE."
@@ -525,7 +542,8 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   (when org-pomodoro-timer
     (cancel-timer org-pomodoro-timer))
   (setq org-pomodoro-state :none
-        org-pomodoro-end-time nil)
+        org-pomodoro-end-time nil
+        org-pomodoro-next-tick-time nil)
   (org-pomodoro-update-mode-line)
   (org-agenda-maybe-redo))
 
