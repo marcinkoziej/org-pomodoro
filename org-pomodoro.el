@@ -348,8 +348,8 @@ Run before a break's specific hook.")
 
 (defvar org-pomodoro-state :none
   "The current state of `org-pomodoro`.
-It changes to :pomodoro when starting a pomodoro and to :longbreak
-or :break when starting a break.")
+It changes to :pomodoro when starting a pomodoro and to :long-break
+or :short-break when starting a break.")
 
 (defvar org-pomodoro-count 0
   "The number of pomodoros since the last long break.")
