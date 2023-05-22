@@ -69,7 +69,7 @@
   "Whether the user needs to exit manually from a running pomodoro to enter a break.
 
 If non-nil, after the time is up for a pomodoro, an \"overtime\"
-state is entered until ‘org-pomodoro’ is invoked, which then
+state is entered until `org-pomodoro' is invoked, which then
 finishes the pomodoro and enters the break period."
   :group 'org-pomodoro
   :type 'boolean)
@@ -537,9 +537,9 @@ The argument STATE is optional.  The default state is `:pomodoro`."
 
 (defun org-pomodoro-overtime ()
   "Is invoked when the time for a pomodoro runs out.
-Notify the user that the pomodoro should be finished by calling ‘org-pomodoro’"
+Notify the user that the pomodoro should be finished by calling `org-pomodoro'"
   (org-pomodoro-maybe-play-sound :overtime)
-  (org-pomodoro-notify "Pomodoro completed. Now on overtime!" "Start break by calling ‘org-pomodoro’")
+  (org-pomodoro-notify "Pomodoro completed. Now on overtime!" "Start break by calling `org-pomodoro'")
   (org-pomodoro-start :overtime)
   (org-pomodoro-update-mode-line)
   (run-hooks 'org-pomodoro-overtime-hook))
