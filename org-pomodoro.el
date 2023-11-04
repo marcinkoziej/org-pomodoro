@@ -529,9 +529,38 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   (org-pomodoro-update-mode-line)
   (org-agenda-maybe-redo))
 
-(defun org-pomodoro-notify (title message)
-  "Send a notification with TITLE and MESSAGE using `alert'."
-  (alert message :title title :category 'org-pomodoro))
+(defun org-pomodoro-notify-args (type)
+  "Returns the notification arguments to use for TYPE, or nil if
+no notification should be sent."
+  (let ((org-pomodoro-annotated
+         (if-let ((key (where-is-internal 'org-pomodoro nil 'first-only)))
+             (format "‘%s (org-pomodoro)’" (key-description key))
+           "‘M-x org-pomodoro RET’")))
+    (cl-case type
+      (:short-break (list (format "Time for a %d minute break." org-pomodoro-short-break-length)
+                          :title "Pomodoro completed!"
+                          :category 'org-pomodoro))
+      (:long-break (list (format "Time for a %d minute break." org-pomodoro-long-break-length)
+                         :title "Pomodoro completed!"
+                         :category 'org-pomodoro))
+      (:short-break-finished (list (format "Ready for another pomodoro? %s" org-pomodoro-annotated)
+                                   :title (format "Short break finished." org-pomodoro-short-break-length)
+                                   :category 'org-pomodoro))
+      (:long-break-finished (list (format "Ready for another pomodoro? %s" org-pomodoro-annotated)
+                                  :title (format "Long break finished." org-pomodoro-long-break-length)
+                                  :category 'org-pomodoro))
+      (:overtime (list (format "Start break with %s" org-pomodoro-annotated)
+                       :title "Pomodoro completed. Now on overtime!"
+                       :category 'org-pomodoro))
+      (:killed (list  "Pomodoro killed."
+                      :title "One does not simply kill a pomodoro!"
+                      :category 'org-pomodoro))
+      (t nil))))
+
+(defun org-pomodoro-notify (type)
+  "Send a notification of a change in the org-pomodoro TYPE using `alert'."
+  (when-let ((details (org-pomodoro-notify-args type)))
+    (apply 'alert details)))
 
 ;; Handlers for pomodoro events.
 
@@ -539,7 +568,7 @@ The argument STATE is optional.  The default state is `:pomodoro`."
   "Is invoked when the time for a pomodoro runs out.
 Notify the user that the pomodoro should be finished by calling ‘org-pomodoro’"
   (org-pomodoro-maybe-play-sound :overtime)
-  (org-pomodoro-notify "Pomodoro completed. Now on overtime!" "Start break by calling ‘org-pomodoro’")
+  (org-pomodoro-notify :overtime)
   (org-pomodoro-start :overtime)
   (org-pomodoro-update-mode-line)
   (run-hooks 'org-pomodoro-overtime-hook))
@@ -551,10 +580,12 @@ This may send a notification, play a sound and start a pomodoro break."
       (org-clock-out nil t))
   (org-pomodoro-maybe-play-sound :pomodoro)
   (setq org-pomodoro-count (+ org-pomodoro-count 1))
-  (if (zerop (mod org-pomodoro-count org-pomodoro-long-break-frequency))
-      (org-pomodoro-start :long-break)
-    (org-pomodoro-start :short-break))
-  (org-pomodoro-notify "Pomodoro completed!" "Time for a break.")
+  (let ((break-type
+          (if (zerop (mod org-pomodoro-count org-pomodoro-long-break-frequency))
+              :long-break
+            :short-break)))
+    (org-pomodoro-start break-type)
+    (org-pomodoro-notify break-type))
   (org-pomodoro-update-mode-line)
   (org-agenda-maybe-redo)
   (run-hooks 'org-pomodoro-finished-hook))
@@ -563,7 +594,7 @@ This may send a notification, play a sound and start a pomodoro break."
   "Is invoked when a pomodoro was killed.
 This may send a notification, play a sound and adds log."
   (org-pomodoro-reset)
-  (org-pomodoro-notify "Pomodoro killed." "One does not simply kill a pomodoro!")
+  (org-pomodoro-notify :killed)
   (org-pomodoro-maybe-play-sound :killed)
   (when (org-clocking-p)
     (if org-pomodoro-keep-killed-pomodoro-time
@@ -577,7 +608,7 @@ This may send a notification and play a sound."
   (when org-pomodoro-clock-break
     (org-clock-out nil t))
   (org-pomodoro-reset)
-  (org-pomodoro-notify "Short break finished." "Ready for another pomodoro?")
+  (org-pomodoro-notify :short-break-finished)
   (org-pomodoro-maybe-play-sound :short-break)
   (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-short-break-finished-hook))
 
@@ -587,7 +618,7 @@ This may send a notification and play a sound."
   (when org-pomodoro-clock-break
     (org-clock-out nil t))
   (org-pomodoro-reset)
-  (org-pomodoro-notify "Long break finished." "Ready for another pomodoro?")
+  (org-pomodoro-notify :long-break-finished)
   (org-pomodoro-maybe-play-sound :long-break)
   (run-hooks 'org-pomodoro-break-finished-hook 'org-pomodoro-long-break-finished-hook))
 
