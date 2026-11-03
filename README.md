@@ -39,6 +39,25 @@ Usage
  4. If you call `org-pomodoro` outside org-mode, you'll be presented
     with list of recent tasks, as `C-u org-clock-in` would.
 
+Effort estimates in pomodoros
+-----------------------------
+
+Run `M-x org-pomodoro-set-effort-in-pomodoros` on a task to estimate
+its effort in pomodoros. The command multiplies your input by
+`org-pomodoro-length` and records the result as an Org effort duration.
+For example, two 25-minute pomodoros set the effort to `0:50`.
+A numeric prefix argument supplies the count without a prompt; fractional
+counts are also supported.
+
+Existing key bindings are unchanged. To use this command with the usual
+effort shortcut, opt in in your configuration:
+
+```elisp
+(with-eval-after-load 'org-pomodoro
+  (define-key org-mode-map (kbd "C-c C-x e")
+    #'org-pomodoro-set-effort-in-pomodoros))
+```
+
 Customization
 =============
 
