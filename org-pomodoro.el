@@ -108,7 +108,7 @@ Use `org-pomodoro-start-sound' to determine what sound that should be."
 
 (defcustom org-pomodoro-start-sound (when load-file-name
                                       (concat (file-name-directory load-file-name)
-                                              "resources/bell.wav"))
+                                              "resources/bell_quiet.wav"))
   "The path to a sound file that´s to be played when a pomodoro is started."
   :group 'org-pomodoro
   :type 'file)
@@ -129,7 +129,7 @@ Use `org-pomodoro-finished-sound' to determine what sound that should be."
 
 (defcustom org-pomodoro-finished-sound (when load-file-name
                                          (concat (file-name-directory load-file-name)
-                                                 "resources/bell.wav"))
+                                                 "resources/bell_quiet.wav"))
   "The path to a sound file that´s to be played when a pomodoro was finished."
   :group 'org-pomodoro
   :type 'file)
@@ -149,7 +149,7 @@ Use `org-pomodoro-overtime-sound' to determine what sound that should be."
 
 (defcustom org-pomodoro-overtime-sound (when load-file-name
                                          (concat (file-name-directory load-file-name)
-                                                 "resources/bell.wav"))
+                                                 "resources/bell_quiet.wav"))
   "The path to a sound file that´s to be played when a pomodoro runs overtime."
   :group 'org-pomodoro
   :type 'file)
@@ -192,7 +192,7 @@ Use `org-pomodoro-short-break-sound' to determine what sound that should be."
 
 (defcustom org-pomodoro-short-break-sound (when load-file-name
                                             (concat (file-name-directory load-file-name)
-                                                    "resources/bell.wav"))
+                                                    "resources/bell_quiet.wav"))
   "The path to a sound file that´s to be played when a break was finished."
   :group 'org-pomodoro
   :type 'file)
@@ -212,7 +212,7 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
 
 (defcustom org-pomodoro-long-break-sound (when load-file-name
                                            (concat (file-name-directory load-file-name)
-                                                   "resources/bell_multiple.wav"))
+                                                   "resources/bell_multiple_quiet.wav"))
   "The path to a sound file that´s to be played when a long break is finished."
   :group 'org-pomodoro
   :type 'file)
@@ -230,7 +230,7 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
 
 (defcustom org-pomodoro-ticking-sound (when load-file-name
                                         (concat (file-name-directory load-file-name)
-                                                "resources/tick.wav"))
+                                                "resources/tick_quiet.wav"))
   "The path to a sound file that´s to be played while a pomodoro is running."
   :group 'org-pomodoro
   :type 'file)
