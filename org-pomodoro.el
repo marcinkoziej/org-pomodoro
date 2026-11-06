@@ -651,6 +651,25 @@ kill the current timer, this may be a break or a running pomodoro."
           (call-interactively 'org-clock-in))))
     (org-pomodoro-start :pomodoro))))
 
+;;;###autoload
+(defun org-pomodoro-set-effort-in-pomodoros (pomodoros)
+  "Set the current task's effort to POMODOROS pomodoros.
+Each pomodoro is `org-pomodoro-length' minutes long.  POMODOROS must
+be a positive number; fractional pomodoros are allowed.
+
+Interactively, use a numeric prefix argument or prompt for a number.
+This command does not change any existing key bindings."
+  (interactive
+   (list (if current-prefix-arg
+             (prefix-numeric-value current-prefix-arg)
+           (read-number "Effort (pomodoros): " 1))))
+  (unless (and (numberp pomodoros) (> pomodoros 0))
+    (user-error "The number of pomodoros must be positive"))
+  (unless (and (numberp org-pomodoro-length) (> org-pomodoro-length 0))
+    (user-error "The pomodoro length must be positive"))
+  (org-set-effort
+   nil (org-duration-from-minutes (* pomodoros org-pomodoro-length))))
+
 (provide 'org-pomodoro)
 
 ;;; org-pomodoro.el ends here
