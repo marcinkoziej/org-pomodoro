@@ -286,11 +286,13 @@ Use `org-pomodoro-long-break-sound' to determine what sound that should be."
   "The time in minutes for which a pomodoro group is valid.
 The size of a pomodoro group is defined by `org-pomodoro-long-break-frequency'.
 
-(defcustom org-pomodoro-count 0
-  "The number of pomodoros since the last long break.")
-
 If you do not clock in for this period of time you will be prompted
 whether to reset the pomodoro count next time you call `org-pomodoro'."
+  :group 'org-pomodoro
+  :type 'integer)
+
+(defcustom org-pomodoro-count 0
+  "The number of pomodoros since the last long break."
   :group 'org-pomodoro
   :type 'integer)
 
